@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "695848890800",
+    "firebase_url": "https://smarttalk-44aa3.firebaseio.com",
+    "project_id": "smarttalk-44aa3",
+    "storage_bucket": "smarttalk-44aa3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695848890800:android:2bda2cec6787ab70",
+        "android_client_info": {
+          "package_name": "com.example.smarttalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "695848890800-4u5qalj140im569ou176re587gkebe95.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smarttalk",
+            "certificate_hash": "27a23b7c06635608dca9532b960b3f3f6782a32e"
+          }
+        },
+        {
+          "client_id": "695848890800-a68cstlptukkikc7cglara1ob1uokorg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzYPi6UMNRWskcj8YUdFyinXnsfMMTaZg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "695848890800-a68cstlptukkikc7cglara1ob1uokorg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
