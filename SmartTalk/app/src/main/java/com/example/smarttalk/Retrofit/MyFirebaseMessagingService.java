@@ -4,7 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.smarttalk.database.DatabaseHelper.MessageDatabaseHelper;
+import com.example.smarttalk.database.DatabaseHelper.DatabaseHelper;
 import com.example.smarttalk.database.model.Message;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -22,12 +22,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         try {
             //Receiver  receive the message.
             JSONObject jsonObject = new JSONObject( remoteMessage.getData() );
-            MessageDatabaseHelper md = new MessageDatabaseHelper( this );
+            DatabaseHelper md = new DatabaseHelper( this );
             Message message=new Message();
             message.setSenderID( jsonObject.getString( "SenderID" ) );
             message.setConversionID(jsonObject.getString( "ReceiverID" ) );
             message.setMessageID( jsonObject.getString( "MessageID" ) );
             message.setBody( jsonObject.getString( "Body" ) );
+            Log.d( TAG, "onMessageReceived: "+ jsonObject.getString( "Body" ) );
             message.setTimeStamp(jsonObject.getString( "TimeStamp" ) );
             md.insert( message );
 

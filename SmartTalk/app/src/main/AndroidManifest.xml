@@ -16,8 +16,6 @@
         <activity android:name=".GetStartedActivity" />
         <activity android:name=".HomeActivity" />
         <activity android:name=".LauncherActivity">
-
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

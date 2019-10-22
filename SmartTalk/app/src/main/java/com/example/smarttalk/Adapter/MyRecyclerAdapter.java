@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -21,7 +22,6 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.example.smarttalk.MessageActivity;
 import com.example.smarttalk.ModelClass.User;
 import com.example.smarttalk.R;
-import com.example.smarttalk.database.DatabaseHelper.ContactDatabaseHelper;
 import com.example.smarttalk.database.model.Contact;
 
 import java.util.List;
@@ -29,13 +29,13 @@ import java.util.List;
 public class MyRecyclerAdapter  extends RecyclerView.Adapter<MyRecyclerAdapter.ViewHolder>  {
     private static final String TAG = "MyRecyclerAdapter";
 public Context mcontext;
-    public List<User> users;
+   // public List<User> users;
+   public List<Contact> contacts;
     String s;
 
-    public MyRecyclerAdapter(Context context, List<User> mfetches) {
+    public MyRecyclerAdapter(Context context, List<Contact> contactmodel) {
         mcontext=context;
-        users = mfetches;
-        Log.d( TAG, "MyRecyclerAdapter: "+ mfetches );
+        contacts=contactmodel;
     }
 
 
@@ -51,37 +51,32 @@ public Context mcontext;
       @Override
         public void onBindViewHolder( ViewHolder holder, int position) {
 
-          final User uploadCurrent = users.get( position );  //getter & Setter
+         // final User uploadCurrent = users.get( position );  //getter & Setter
+          final  Contact mcontact=contacts.get( position );
          // holder.Tname.setText( uploadCurrent.getFirstname().concat( uploadCurrent.getLastname() ) );
-          holder.Tname.setText( uploadCurrent.getFirstname() +" "+ uploadCurrent.getLastname()  );
-          holder.Tnumber.setText( uploadCurrent.getMobilenumber() );
-
-          //Offline data will save in databas
-          ContactDatabaseHelper contactDatabaseHelper=new ContactDatabaseHelper( mcontext );
-          Contact contact=new Contact();
-          contact.setFirstName( uploadCurrent.getFirstname() );
-          contact.setLastName(uploadCurrent.getLastname()  );
-          contact.setMobileNmuber( uploadCurrent.getMobilenumber() );
-          contactDatabaseHelper.insert(contact);
+          holder.Tname.setText( mcontact.getFirstName() +" "+ mcontact.getLastName()  );
+          Log.d( TAG, "onBindViewHolder: "+mcontact.getFirstName());
+          holder.Tnumber.setText( mcontact.getMobileNmuber() );
 
           //color generator
           ColorGenerator generator=ColorGenerator.MATERIAL;    //color generator
-          String x=uploadCurrent.getFirstname();
+          String x=mcontact.getFirstName();
           String[] myName = x.split(" ");
           for (int i = 0; i < myName.length; i++) {
                s = myName[i];
           }
+          //https://github.com/amulyakhare/TextDrawable
           TextDrawable drawable2 = TextDrawable.builder()
-                  .buildRound( String.valueOf( s.charAt(0) ),generator.getRandomColor() );
-            holder.image.setImageDrawable( drawable2 );
+                  .buildRound( String.valueOf( s.charAt( 0 ) ), generator.getRandomColor() );
+          holder.image.setImageDrawable( drawable2 );
 
           holder.itemView.setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View view) {
                   Intent intent = new Intent( mcontext, MessageActivity.class );
-                  intent.putExtra( "ReceiverUserID", uploadCurrent.getUserId() );
-                  intent.putExtra( "number", uploadCurrent.getMobilenumber() );
-                  intent.putExtra( "name", uploadCurrent.getFirstname() + " " + uploadCurrent.getLastname() );
+                  intent.putExtra( "ReceiverUserID", mcontact.getUserID() );
+                  intent.putExtra( "number",mcontact.getMobileNmuber());
+                  intent.putExtra( "name", mcontact.getFirstName() + " " + mcontact.getLastName() );
                   mcontext.startActivity( intent );
               }
           });
@@ -90,15 +85,9 @@ public Context mcontext;
     @Override
     public int getItemCount() {
 
-        return users.size();
+        return contacts.size();
     }
 
-BroadcastReceiver broadcastReceiver=new BroadcastReceiver() {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-
-    }
-};
 
     class ViewHolder extends RecyclerView.ViewHolder {
            TextView Tname,Tnumber;

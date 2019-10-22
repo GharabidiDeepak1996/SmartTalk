@@ -1,9 +1,18 @@
 package com.example.smarttalk.database.model;
 
 public class Contact {
+    private String UserID;
     private String FirstName;
     private String LastName;
     private String MobileNmuber;
+
+    public String getUserID() {
+        return UserID;
+    }
+
+    public void setUserID(String userID) {
+        UserID = userID;
+    }
 
     public String getFirstName() {
         return FirstName;

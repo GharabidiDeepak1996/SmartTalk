@@ -28,7 +28,7 @@ import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConsta
 public class AuthenticationActivity extends AppCompatActivity {
     //https://firebase.google.com/docs/auth/android/manage-users
     private static final String TAG = "AuthenticationActivity";
-    public static final String PREFERENCE_NAME = "mydata";
+   // public static final String PREFERENCE_NAME = "mydata";
     String UserID;
 
 
@@ -95,8 +95,12 @@ public class AuthenticationActivity extends AppCompatActivity {
                     Intent intent = new Intent( AuthenticationActivity.this, HomeActivity.class );
                     startActivity( intent );
                     //Save Contact Number into Shared Preference
+                    //https://www.journaldev.com/9412/android-shared-preferences-example-tutorial
+                    //https://stackoverflow.com/questions/23024831/android-shared-preferences-example
+                    //https://github.com/orhanobut/hawk
                     SharedPreferences sharedPreferences=getSharedPreferences( SHARED_PREF_NAME ,MODE_PRIVATE);
                     SharedPreferences.Editor editor=sharedPreferences.edit();
+                    Log.d( TAG, "onDataChange: "+user );
                     editor.putString( LOGGED_IN_USER_CONTACT_NUMBER, user);
                     editor.apply();
 
@@ -111,7 +115,6 @@ public class AuthenticationActivity extends AppCompatActivity {
 
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
@@ -120,17 +123,14 @@ public class AuthenticationActivity extends AppCompatActivity {
         } );
         Log.d( TAG, "database: " + user );
     }
-
     @Override
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener( mAuthStateListner );
     }
-
     @Override
     protected void onPause() {
         super.onPause();
         mFirebaseAuth.removeAuthStateListener( mAuthStateListner );
-
     }
 }

@@ -1,7 +1,6 @@
 package com.example.smarttalk.Fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -15,13 +14,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.example.smarttalk.MessageActivity;
 import com.example.smarttalk.ModelClass.User;
 import com.example.smarttalk.Adapter.MyRecyclerAdapter;
 import com.example.smarttalk.R;
 import com.example.smarttalk.constants.AppConstant;
+import com.example.smarttalk.database.DatabaseHelper.DatabaseHelper;
+import com.example.smarttalk.database.model.Contact;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -32,20 +31,23 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
-import static androidx.recyclerview.widget.RecyclerView.HORIZONTAL;
 
 
 public class ContactsFragment extends Fragment {
     // https://www.simplifiedcoding.net/firebase-storage-example/
 
-    RecyclerView recyclerView;
-    private ArrayList<User> mUserList;
+    private RecyclerView recyclerView;
+    // private ArrayList<User> mUserList;
     private MyRecyclerAdapter mfetchAdapter;
     private String mLoggedInUserContactNumber;
     private Context mContext;
     private SharedPreferences mPreference;
+    private String FirstName, LastName, MobileNumber, UserID;
+    DatabaseHelper databaseHelper;
+    private List<Contact> contactmodel;
 
     private static final String TAG = "ContactsFragment";
     //private static final String TAG = "MyFirebaseMessagingServ";
@@ -64,19 +66,25 @@ public class ContactsFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager( getActivity() );
         recyclerView.setLayoutManager( linearLayoutManager );
 
-         DividerItemDecoration itemDecor = new DividerItemDecoration(getActivity(), linearLayoutManager.getOrientation());
-         recyclerView.addItemDecoration(itemDecor);
+        DividerItemDecoration itemDecor = new DividerItemDecoration( getActivity(), linearLayoutManager.getOrientation() );
+        recyclerView.addItemDecoration( itemDecor );
 //sharedpreferences
         mContext = getActivity();
         mPreference = mContext.getSharedPreferences( AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE );
         mLoggedInUserContactNumber = mPreference.getString( AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_CONTACT_NUMBER, null );
 
-        Log.d( TAG, "onCreateView: "+mLoggedInUserContactNumber );
+        Log.d( TAG, "onCreateView: " + mLoggedInUserContactNumber );
 
-        mUserList = new ArrayList<>();
+        databaseHelper = new DatabaseHelper( getActivity() );
+        contactmodel = new ArrayList<>();
+        //  mUserList = new ArrayList<>();
+        contactmodel = databaseHelper.display();
 
+        mfetchAdapter = new MyRecyclerAdapter( getActivity(), contactmodel );
+        recyclerView.setAdapter( mfetchAdapter );
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = firebaseDatabase.getReference( "User" );
+
         databaseReference.addValueEventListener( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -86,25 +94,32 @@ public class ContactsFragment extends Fragment {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     //all the user id will access here in userID
                     String userId = postSnapshot.getKey();
-                    Log.d( TAG, "onDataChange: KEY " + userId );
                     User user = postSnapshot.getValue( User.class );
+
                     if (user != null) {
                         user.setUserId( userId );
                     }
-
                     //Log.d( TAG, "onDataChange: " + user );
-                    if (mLoggedInUserContactNumber != null && !mLoggedInUserContactNumber.equalsIgnoreCase( user.getMobilenumber() )) {
 
-                        mUserList.add( user );
+                    if (mLoggedInUserContactNumber != null && !mLoggedInUserContactNumber.equalsIgnoreCase( user.getMobilenumber() )) {
+                        UserID = user.getUserId();
+                        FirstName = user.getFirstname();
+                        LastName = user.getLastname();
+                        MobileNumber = user.getMobilenumber();
+                        Log.d( TAG, "onDataChange: 0+"+MobileNumber );
+                        //Offline data will save in databas
+                        Contact contact = new Contact();
+                        contact.setUserID( UserID );
+                        contact.setFirstName( FirstName );
+                        contact.setLastName( LastName );
+                        contact.setMobileNmuber( MobileNumber );
+
+                        databaseHelper.insert( contact );
                     } else {
 
                         checkForCurrentLoggedInUser( user );
                     }
                 }
-                mfetchAdapter = new MyRecyclerAdapter( getActivity(), mUserList );
-                //Log.d( TAG, "onDataChange 3: " + mUserList );
-                recyclerView.setAdapter( mfetchAdapter );
-                //Add mUserList into database;
             }
 
             @Override
@@ -122,17 +137,17 @@ public class ContactsFragment extends Fragment {
             //senderID send to messageActivity
 
         }
-        Log.d( TAG, "checkForCurrentLoggedInUser: user Contanct Number : "  + user.getMobilenumber());
+        Log.d( TAG, "checkForCurrentLoggedInUser: user Contanct Number : " + user.getMobilenumber() );
 
         //save the data login user in sharedpreference
         SharedPreferences.Editor edit = mPreference.edit();
         edit.putString( AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_NAME, user.getFirstname() + " " + user.getLastname() );
-        edit.putString( AppConstant.SharedPreferenceConstant.LOOGED_IN_USER_ID , user.getUserId() );
-        Log.d( TAG, "userID: "+user.getUserId() );
+        edit.putString( AppConstant.SharedPreferenceConstant.LOOGED_IN_USER_ID, user.getUserId() );
+        Log.d( TAG, "userID: " + user.getUserId() );
         edit.apply();
 
 //subscribe FCM sender topic should be subscribe because of receiver the message from receiver side.
-        FirebaseMessaging.getInstance().subscribeToTopic( user.getUserId())
+        FirebaseMessaging.getInstance().subscribeToTopic( user.getUserId() )
                 .addOnCompleteListener( new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -141,7 +156,7 @@ public class ContactsFragment extends Fragment {
                             msg = getString( R.string.msg_subscribe_failed );
                         }
                         Log.d( TAG, "onComplete: " + task.isSuccessful() );
-                        Log.d( TAG, "onComplete: User ID : "  + user.getUserId());
+                        Log.d( TAG, "onComplete: User ID : " + user.getUserId() );
                         //Toast.makeText(ContactsFragment.this, msg, Toast.LENGTH_SHORT).show();
                     }
                 } );
