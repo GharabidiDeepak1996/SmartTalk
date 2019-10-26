@@ -77,11 +77,11 @@ public class ContactsFragment extends Fragment {
 
         databaseHelper = new DatabaseHelper( getActivity() );
         contactmodel = new ArrayList<>();
-        //  mUserList = new ArrayList<>();
         contactmodel = databaseHelper.display();
 
         mfetchAdapter = new MyRecyclerAdapter( getActivity(), contactmodel );
         recyclerView.setAdapter( mfetchAdapter );
+
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = firebaseDatabase.getReference( "User" );
 

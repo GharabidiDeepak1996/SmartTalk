@@ -45,10 +45,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull MessageAdapter.ViewHolder holder, int position) {
         Message chat = mChat.get(position);
+        Log.d( TAG, "onBindViewHolder: "+chat.getBody() );
         holder.show_message.setText(chat.getBody());
+        holder.time_stamp.setText( chat.getTimeStamp() );
     }
 
     public void addMessageToAdapter(Message message){
+        Log.d( TAG, "messgae 2: "+message);
         mChat.add( message );
         this.notifyItemInserted( mChat.size()-1 );
     }
@@ -71,10 +74,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView show_message;
+        public TextView time_stamp;
         public ViewHolder(@NonNull View itemView) {
             super( itemView );
 
             show_message=itemView.findViewById( R.id.show_message);
+            time_stamp=itemView.findViewById( R.id.timestamp );
         }
     }
 }

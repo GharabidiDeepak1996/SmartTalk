@@ -83,6 +83,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Intent intent = new Intent( THIS_BROADCAST );
         intent.putExtra( "MessageID", message.getMessageID() );
+        intent.putExtra( "ConversionID",message.getConversionID() );
         context.sendBroadcast( intent );
     }
 
@@ -108,6 +109,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery( query, null );
         StringBuffer stringBuffer = new StringBuffer();
+        Log.d( TAG, "display:string buffer "+stringBuffer );
         // Student student1=null; optional
 
         while(cursor.moveToNext()){
@@ -118,7 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String mobile_number= cursor.getString( cursor.getColumnIndex(Contacts.MOBILE_NUMBER));
 
             Log.d( TAG, "display:First Name: "+ first_name +",Lastname: "+last_name+",Mobilenumber :"+mobile_number );
-contact.setUserID( user_id );
+            contact.setUserID( user_id );
             contact.setFirstName( first_name );
             contact.setLastName( last_name );
             contact.setMobileNmuber( mobile_number );
@@ -135,19 +137,19 @@ contact.setUserID( user_id );
     public Message getMessageById(String messageId) {
 
         SQLiteDatabase database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + Messages.TABLE_NAME+" WHERE "+ Messages.MessageID +" = '"+messageId+"' ;";
-        Cursor cursor = database.rawQuery(query, null);
-        Log.d(TAG, "Cursor Count : " + cursor.getCount());
+        String query = "SELECT * FROM " + Messages.TABLE_NAME + " WHERE " + Messages.MessageID + " = '" + messageId + "' ;";
+        Cursor cursor = database.rawQuery( query, null );
+        Log.d( TAG, "Cursor Count : " + cursor.getCount() );
         Message message = new Message();
 
         while (cursor.moveToNext()) {
-            String senderId = cursor.getString(cursor.getColumnIndex(Messages.SenderID));
-            String conversionId = cursor.getString(cursor.getColumnIndex(Messages.conversionID));
-            String messageID = cursor.getString(cursor.getColumnIndex(Messages.MessageID));
-            String body = cursor.getString(cursor.getColumnIndex(Messages.Body));
-            String timeStamp =cursor.getString(cursor.getColumnIndex(Messages.TimeStamp));
+          String senderId = cursor.getString( cursor.getColumnIndex( Messages.SenderID ) );
+            String conversionId = cursor.getString( cursor.getColumnIndex( Messages.conversionID ) );
+            String messageID = cursor.getString( cursor.getColumnIndex( Messages.MessageID ) );
+            String body = cursor.getString( cursor.getColumnIndex( Messages.Body ) );
+            String timeStamp = cursor.getString( cursor.getColumnIndex( Messages.TimeStamp ) );
 
-            message.setSenderID( senderId );
+           message.setSenderID( senderId );
             message.setConversionID( conversionId );
             message.setMessageID( messageID );
             message.setBody( body );
@@ -155,6 +157,37 @@ contact.setUserID( user_id );
         }
         cursor.close();
         return message;
+    }
+
+    public List<Message> getConversionID(String conversionID ) {
+        //Log.d( TAG, "getConversionID: " + conversionID );
+        List<Message> MessageList = new ArrayList<>(  );
+
+        SQLiteDatabase data = this.getReadableDatabase();
+       // String query = "SELECT * FROM " + Messages.TABLE_NAME;
+        String query = "SELECT * FROM " + Messages.TABLE_NAME + " WHERE " + Messages.conversionID + " = '" +conversionID+ "' ;";
+        Cursor cursor = data.rawQuery( query, null );
+        Log.d( TAG, "Cursor Count : " + cursor.getCount() );
+        Message message = new Message();
+
+        while (cursor.moveToNext()) {
+            String senderId = cursor.getString( cursor.getColumnIndex( Messages.SenderID ) );
+            String conversionId = cursor.getString( cursor.getColumnIndex( Messages.conversionID ) );
+            String messageID = cursor.getString( cursor.getColumnIndex( Messages.MessageID ) );
+            String body = cursor.getString( cursor.getColumnIndex( Messages.Body ) );
+            String timeStamp = cursor.getString( cursor.getColumnIndex( Messages.TimeStamp ) );
+
+
+            message.setSenderID( senderId );
+            message.setConversionID( conversionId );
+            message.setMessageID( messageID );
+            message.setBody( body );
+            message.setTimeStamp( timeStamp );
+
+            MessageList.add( message );
+        }
+        cursor.close();
+        return MessageList;
     }
 
     @Override

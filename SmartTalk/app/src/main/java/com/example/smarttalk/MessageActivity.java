@@ -50,33 +50,22 @@ public class MessageActivity extends AppCompatActivity {
     Toolbar mtoolbar;
     ImageButton btn_send;
     EditText text_send;
-ScrollView scrollView;
-    Context mcontext;
-
-    String ReceiverUserID;
-    String SenderID;
-    String Mobileno;
-    String Name;
-    MessageAdapter messageAdapter;
-  //  private ArrayList<Data> mchat;
-
-    String MessageID;
     TextView textView;
     ImageView imageView;
+
+    String ReceiverUserID,SenderID,Mobileno,Name,MessageID,timeStamp;
+    MessageAdapter messageAdapter;
     RecyclerView recyclerView;
-    String timeStamp;
+    Context mcontext;
+    List<Message> message1;
+
     public static final String THIS_BROADCAST = "this is my broadcast";
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_message );
-
-        MessageID =Utils.generateRandomString( 16 );
-
-//Broadcast Receiver
+        MessageID = Utils.generateRandomString( 16 );
+        //Broadcast Receiver
         IntentFilter intentFilter = new IntentFilter( THIS_BROADCAST );
         registerReceiver( broadcastReceiver, intentFilter );
 
@@ -84,7 +73,6 @@ ScrollView scrollView;
         text_send = findViewById( R.id.Emessage );
         textView = findViewById( R.id.text );
         imageView = findViewById( R.id.Image );
-scrollView=findViewById( R.id.scrollView );
 
         //toolbar
         mtoolbar = findViewById( R.id.toolbar );
@@ -103,29 +91,34 @@ scrollView=findViewById( R.id.scrollView );
         Mobileno = intent.getStringExtra( "number" );
         Name = intent.getStringExtra( "name" );
         textView.setText( Name );
+        imageView.setImageResource( R.mipmap.ic_launcher );
 
-      setupToolbar();
-
+        setupToolbar();
         if (ReceiverUserID.contains( "==" )) {
             ReceiverUserID = ReceiverUserID.replace( "==", "" );
-            Log.d( TAG, "onCreate: ReplaceUserID " + ReceiverUserID );
+
         }
 
         //MessageAdapter
-        messageAdapter = new MessageAdapter( MessageActivity.this, new ArrayList<Message>(  ) );
+       /* messageAdapter = new MessageAdapter( MessageActivity.this, new ArrayList<Message>() );
         recyclerView.setAdapter( messageAdapter );
+*/
+        DatabaseHelper databaseHelper=new DatabaseHelper( this );
+        message1 = new ArrayList<>();
+        message1=databaseHelper.getConversionID( ReceiverUserID );
 
-
+        messageAdapter = new MessageAdapter( MessageActivity.this, message1 );
+        recyclerView.setAdapter( messageAdapter );
     }
 
     private void setupToolbar() {
         //https://medium.com/android-grid/how-to-implement-back-up-button-on-toolbar-android-studio-c272bbc0f1b0
         setSupportActionBar( mtoolbar );
         getSupportActionBar().setDisplayHomeAsUpEnabled( true );
-        getSupportActionBar().setHomeAsUpIndicator( R.drawable.ic_arrow_back_black_24dp);
+        getSupportActionBar().setHomeAsUpIndicator( R.drawable.ic_arrow_back_black_24dp );
     }
 
-//onClick Listnar
+    //onClick Listnar
     public void sendMessage(View view) {
         //scrollView
         recyclerView.smoothScrollToPosition( text_send.getBottom() );
@@ -142,13 +135,16 @@ scrollView=findViewById( R.id.scrollView );
             SharedPreferences preferences = getSharedPreferences( SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE );
             SenderID = preferences.getString( LOOGED_IN_USER_ID, "" );
             sendMessage( SenderID, ReceiverUserID, msg ); //receiverside
-            senderMessage(SenderID,ReceiverUserID,MessageID,msg,timeStamp); //sender side
+            senderMessage( SenderID, ReceiverUserID, MessageID, msg, timeStamp ); //sender side
+
+
 
         } else {
             Toast.makeText( MessageActivity.this, "You can't send empty message", Toast.LENGTH_SHORT ).show();
         }
         //"" this indicate the black
         text_send.setText( "" );
+
     }
 
     //This for sender side.
@@ -190,16 +186,16 @@ scrollView=findViewById( R.id.scrollView );
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d( TAG, "onReceive: " + context );
+            mcontext=context;
+
             Bundle bundle = intent.getExtras();
             String MessageID = bundle.getString( "MessageID" );
-            Log.d( TAG, "MessageID: " + MessageID );
 
             //Get message data from database using messageId
-            DatabaseHelper handler = new DatabaseHelper(context);
-            Message message = handler.getMessageById(MessageID);
+            DatabaseHelper handler = new DatabaseHelper( context );
+            Message message =  handler.getMessageById( MessageID );
+            messageAdapter.addMessageToAdapter( message );
 
-            messageAdapter.addMessageToAdapter(  message);
         }
     };
 
@@ -207,18 +203,18 @@ scrollView=findViewById( R.id.scrollView );
         super.onDestroy();
         unregisterReceiver( broadcastReceiver );
     }
-   public void senderMessage(String SenderID,String ReceiverUserID,String MessageID,String msg,String timeStamp){
-        Message message=new Message();
+
+    public void senderMessage(String SenderID, String ReceiverUserID, String MessageID, String msg, String timeStamp) {
+        Message message = new Message();
         message.setSenderID( SenderID );
         message.setConversionID( ReceiverUserID );
-        message.setMessageID(  MessageID);
-        message.setBody(  msg);
+        message.setMessageID( MessageID );
+        message.setBody( msg );
         message.setTimeStamp( timeStamp );
 
-        DatabaseHelper databaseHelper=new DatabaseHelper( this );
+        DatabaseHelper databaseHelper = new DatabaseHelper( this );
         databaseHelper.insert( message );
-
-   }
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -229,7 +225,6 @@ scrollView=findViewById( R.id.scrollView );
                 onBackPressed();
                 break;
         }
-
         return super.onOptionsItemSelected( item );
     }
 }
