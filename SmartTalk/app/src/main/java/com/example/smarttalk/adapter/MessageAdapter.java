@@ -1,4 +1,4 @@
-package com.example.smarttalk.Adapter;
+package com.example.smarttalk.adapter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,11 +16,15 @@ import com.example.smarttalk.database.model.Message;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
-    public static  final int MSG_TYPE_LEFT = 0;
-    public static  final int MSG_TYPE_RIGHT = 1;
+    private static  final int MSG_TYPE_LEFT = 0;
+    private static  final int MSG_TYPE_RIGHT = 1;
     private static final String TAG = "MessageAdapter";
 
     private Context mContext;
@@ -36,6 +40,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public MessageAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == MSG_TYPE_RIGHT) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.message_on_rightside, parent, false);
+
             return new MessageAdapter.ViewHolder(view);
         } else {
             View view = LayoutInflater.from(mContext).inflate( R.layout.message_on_leftside, parent, false);
@@ -44,10 +49,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     }
     @Override
     public void onBindViewHolder(@NonNull MessageAdapter.ViewHolder holder, int position) {
-        Message chat = mChat.get(position);
-        Log.d( TAG, "onBindViewHolder: "+chat.getBody() );
-        holder.show_message.setText(chat.getBody());
-        holder.time_stamp.setText( chat.getTimeStamp() );
+        Message message = mChat.get(position);
+        Log.d( TAG, "onBindViewHolder145: "+ position );
+       // holder.show_message.setText( message.getBody());
+        // holder.time_stamp.setText( message.getTimeStamp() );
+        holder.listTextView.get( 0 ).setText( message.getBody());
+        holder.listTextView.get( 1 ).setText( message.getTimeStamp());
     }
 
     public void addMessageToAdapter(Message message){
@@ -72,14 +79,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         return mChat.size() ;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView show_message;
-        public TextView time_stamp;
-        public ViewHolder(@NonNull View itemView) {
-            super( itemView );
+    class ViewHolder extends RecyclerView.ViewHolder {
+     //   @BindViews(  {R.id.show_message,R.id.timestamp} ) TextView show_message,time_stamp;
+      //or
+     @BindViews(  {R.id.show_message,R.id.timestamp} ) List<TextView> listTextView;
 
-            show_message=itemView.findViewById( R.id.show_message);
-            time_stamp=itemView.findViewById( R.id.timestamp );
+        ViewHolder(@NonNull View itemView) {
+            super( itemView );
+            ButterKnife.bind(this, itemView);
+
         }
     }
 }

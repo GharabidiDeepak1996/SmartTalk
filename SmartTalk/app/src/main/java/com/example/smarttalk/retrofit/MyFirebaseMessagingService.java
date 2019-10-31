@@ -1,10 +1,10 @@
-package com.example.smarttalk.Retrofit;
+package com.example.smarttalk.retrofit;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.smarttalk.database.DatabaseHelper.DatabaseHelper;
+import com.example.smarttalk.database.databasehelper.DatabaseHelper;
 import com.example.smarttalk.database.model.Message;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -25,7 +25,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             DatabaseHelper md = new DatabaseHelper( this );
             Message message=new Message();
             message.setSenderID( jsonObject.getString( "SenderID" ) );
-            message.setConversionID(jsonObject.getString( "ReceiverID" ) );
+            message.setConversionID(jsonObject.getString( "SenderID" ) );
             message.setMessageID( jsonObject.getString( "MessageID" ) );
             message.setBody( jsonObject.getString( "Body" ) );
             Log.d( TAG, "onMessageReceived: "+ jsonObject.getString( "Body" ) );

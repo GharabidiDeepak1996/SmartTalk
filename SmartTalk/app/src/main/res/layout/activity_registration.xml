@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         app:cornerRadius="22dp"
         android:layout_margin="16dp"
-        android:text="registration" />
+        android:text="@string/registration" />
 
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.example.smarttalk.Retrofit;
+package com.example.smarttalk.retrofit;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

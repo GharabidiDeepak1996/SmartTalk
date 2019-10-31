@@ -1,4 +1,4 @@
-package com.example.smarttalk.Adapter;
+package com.example.smarttalk.adapter;
 
 import android.util.Log;
 
@@ -6,19 +6,19 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.example.smarttalk.Fragment.ChatsFragment;
-import com.example.smarttalk.Fragment.ContactsFragment;
+import com.example.smarttalk.fragment.ChatsFragment;
+import com.example.smarttalk.fragment.ContactsFragment;
 
 import java.util.List;
 
-public class MyTabLayoutAdapter extends FragmentStatePagerAdapter {
-    private static final String TAG = "MyTabLayoutAdapter";
+public class TabLayoutAdapter extends FragmentStatePagerAdapter {
+    private static final String TAG = "TabLayoutAdapter";
     private List<String> List1;
 
-    public MyTabLayoutAdapter(FragmentManager fm, List<String> List) {
+    public TabLayoutAdapter(FragmentManager fm, List<String> List) {
         super( fm );
-        Log.d( TAG, "MyTabLayoutAdapter: "+fm );
-        Log.d( TAG, "MyTabLayoutAdapter: "+List );
+        Log.d( TAG, "TabLayoutAdapter: "+fm );
+        Log.d( TAG, "TabLayoutAdapter: "+List );
         List1=List;
     }
 

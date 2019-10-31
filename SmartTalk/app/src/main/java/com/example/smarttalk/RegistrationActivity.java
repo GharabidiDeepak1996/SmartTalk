@@ -5,14 +5,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.smarttalk.ModelClass.RModelClass;
+import com.example.smarttalk.modelclass.RModelClass;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
 
 import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_CONTACT_NUMBER;
 import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME;
@@ -22,19 +27,19 @@ public class RegistrationActivity extends AppCompatActivity {
     private static final String TAG = "RegistrationActivity";
 
     RModelClass modelclass;
-    EditText Efirstname;
-    EditText Elastname;
     String mobilenumber;
     DatabaseReference myRef;
     FirebaseDatabase database;
+    @BindViews({R.id.FirstName,R.id.LastName} ) List<EditText> ListEditText;
+
 String UserID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_registration );
-        Efirstname=findViewById( R.id.FirstName );
-        Elastname=findViewById(R.id.LastName);
+        ButterKnife.bind( this );
+
         mobilenumber=getIntent().getStringExtra( "MobileNumber" );
         UserID=getIntent().getStringExtra( "UserID" );
         modelclass = new RModelClass();
@@ -42,8 +47,7 @@ String UserID;
 
     private void getValues() {
         modelclass.setUserID( UserID );
-        String firstname=Efirstname.getText().toString();
-
+        String firstname=ListEditText.get( 0 ).getText().toString();
         // Create firstname a char array of given String
         char cfname[] = firstname.toCharArray();
         for (int i = 0; i < firstname.length(); i++) {
@@ -69,7 +73,7 @@ String UserID;
         String Firstname = new String(cfname);
         modelclass.setFirstname( Firstname );
 
-        String lastname=Elastname.getText().toString();
+        String lastname=ListEditText.get( 1 ).getText().toString();
         // Create Lastname a char array of given String
         char clname[] = lastname.toCharArray();
         for (int i = 0; i < lastname.length(); i++) {

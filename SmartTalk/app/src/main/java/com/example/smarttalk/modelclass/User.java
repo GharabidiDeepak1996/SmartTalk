@@ -1,4 +1,4 @@
-package com.example.smarttalk.ModelClass;
+package com.example.smarttalk.modelclass;
 
 public class User {
     private static final String TAG = "User";

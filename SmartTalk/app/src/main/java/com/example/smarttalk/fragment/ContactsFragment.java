@@ -1,4 +1,4 @@
-package com.example.smarttalk.Fragment;
+package com.example.smarttalk.fragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,11 +15,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.smarttalk.ModelClass.User;
-import com.example.smarttalk.Adapter.MyRecyclerAdapter;
+import com.example.smarttalk.adapter.ContactAdapter;
+import com.example.smarttalk.modelclass.User;
 import com.example.smarttalk.R;
 import com.example.smarttalk.constants.AppConstant;
-import com.example.smarttalk.database.DatabaseHelper.DatabaseHelper;
+import com.example.smarttalk.database.databasehelper.DatabaseHelper;
 import com.example.smarttalk.database.model.Contact;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -33,15 +33,18 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 import static android.content.Context.MODE_PRIVATE;
 
 
 public class ContactsFragment extends Fragment {
     // https://www.simplifiedcoding.net/firebase-storage-example/
 
-    private RecyclerView recyclerView;
-    // private ArrayList<User> mUserList;
-    private MyRecyclerAdapter mfetchAdapter;
+    @BindView(R.id.recyclerview) RecyclerView recyclerView;
+
+    private ContactAdapter mfetchAdapter;
     private String mLoggedInUserContactNumber;
     private Context mContext;
     private SharedPreferences mPreference;
@@ -60,12 +63,12 @@ public class ContactsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate( R.layout.fragment_contacts, container, false );
-        recyclerView = view.findViewById( R.id.recyclerview );
+        ButterKnife.bind( this,view );
 
         recyclerView.setHasFixedSize( true ); //setHasFixedSize to true when changing the contents of the adapter does not change it's height or the width.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager( getActivity() );
         recyclerView.setLayoutManager( linearLayoutManager );
-
+//line divider bewt the cardview
         DividerItemDecoration itemDecor = new DividerItemDecoration( getActivity(), linearLayoutManager.getOrientation() );
         recyclerView.addItemDecoration( itemDecor );
 //sharedpreferences
@@ -78,8 +81,8 @@ public class ContactsFragment extends Fragment {
         databaseHelper = new DatabaseHelper( getActivity() );
         contactmodel = new ArrayList<>();
         contactmodel = databaseHelper.display();
-
-        mfetchAdapter = new MyRecyclerAdapter( getActivity(), contactmodel );
+        Log.d( TAG, "contactmodel: "+contactmodel );
+        mfetchAdapter = new ContactAdapter( getActivity(), contactmodel );
         recyclerView.setAdapter( mfetchAdapter );
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -90,18 +93,23 @@ public class ContactsFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d( TAG, "onDataChange 1: " + dataSnapshot );
                 //iterating through all the values in database
+                List<Contact> contactList = new ArrayList<>(  );
 
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     //all the user id will access here in userID
                     String userId = postSnapshot.getKey();
-                    User user = postSnapshot.getValue( User.class );
 
-                    if (user != null) {
+                    User user = postSnapshot.getValue( User.class );
+                    if (user != null ) {
                         user.setUserId( userId );
                     }
-                    //Log.d( TAG, "onDataChange: " + user );
+                    if (user.getUserId().contains( "==" )) {
+                        user.setUserId( user.getUserId().replace( "==", "" ) );
+                    }
 
                     if (mLoggedInUserContactNumber != null && !mLoggedInUserContactNumber.equalsIgnoreCase( user.getMobilenumber() )) {
+
+                        Log.d( TAG, "UserID55: "+user.getUserId());
                         UserID = user.getUserId();
                         FirstName = user.getFirstname();
                         LastName = user.getLastname();
@@ -113,13 +121,15 @@ public class ContactsFragment extends Fragment {
                         contact.setFirstName( FirstName );
                         contact.setLastName( LastName );
                         contact.setMobileNmuber( MobileNumber );
-
+                        Log.d( TAG, "UserID: "+UserID );
                         databaseHelper.insert( contact );
+                        contactList.add( contact );
                     } else {
 
                         checkForCurrentLoggedInUser( user );
                     }
                 }
+                mfetchAdapter.setContactList( contactList );
             }
 
             @Override
@@ -132,14 +142,13 @@ public class ContactsFragment extends Fragment {
     }
 
     private void checkForCurrentLoggedInUser(final User user) {
-        if (user.getUserId().contains( "==" )) {
+       /* if (user.getUserId().contains( "==" )) {
             user.setUserId( user.getUserId().replace( "==", "" ) );
             //senderID send to messageActivity
+        }*/
+        Log.d( TAG, "checkForCurrentLoggedInUser: user Contanct Number : " + user.getUserId());
 
-        }
-        Log.d( TAG, "checkForCurrentLoggedInUser: user Contanct Number : " + user.getMobilenumber() );
-
-        //save the data login user in sharedpreference
+        //save the data login user in sharedpreference TO MESSAGE ACTIVITY
         SharedPreferences.Editor edit = mPreference.edit();
         edit.putString( AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_NAME, user.getFirstname() + " " + user.getLastname() );
         edit.putString( AppConstant.SharedPreferenceConstant.LOOGED_IN_USER_ID, user.getUserId() );

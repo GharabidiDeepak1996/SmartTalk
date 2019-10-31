@@ -1,4 +1,4 @@
-package com.example.smarttalk.Retrofit;
+package com.example.smarttalk.retrofit;
 
 public class MessageEntity {
 

@@ -1,6 +1,4 @@
-package com.example.smarttalk.Retrofit;
-
-import java.sql.Timestamp;
+package com.example.smarttalk.retrofit;
 
 public class Data {
     public String MessageID;

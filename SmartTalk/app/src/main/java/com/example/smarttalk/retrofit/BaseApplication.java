@@ -1,6 +1,5 @@
-package com.example.smarttalk.Retrofit;
+package com.example.smarttalk.retrofit;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 
 import retrofit2.Retrofit;

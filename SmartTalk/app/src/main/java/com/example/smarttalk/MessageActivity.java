@@ -18,25 +18,27 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.smarttalk.Adapter.MessageAdapter;
-import com.example.smarttalk.ModelClass.User;
-import com.example.smarttalk.Retrofit.BaseApplication;
-import com.example.smarttalk.Retrofit.Data;
-import com.example.smarttalk.Retrofit.FCMAPI;
-import com.example.smarttalk.Retrofit.MessageEntity;
+import com.example.smarttalk.adapter.MessageAdapter;
+import com.example.smarttalk.retrofit.BaseApplication;
+import com.example.smarttalk.retrofit.Data;
+import com.example.smarttalk.retrofit.FCMAPI;
+import com.example.smarttalk.retrofit.MessageEntity;
 import com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant;
-import com.example.smarttalk.database.DatabaseHelper.DatabaseHelper;
+import com.example.smarttalk.database.databasehelper.DatabaseHelper;
 import com.example.smarttalk.database.model.Message;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,15 +49,15 @@ import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConsta
 
 public class MessageActivity extends AppCompatActivity {
     private static final String TAG = "MessageActivity";
-    Toolbar mtoolbar;
-    ImageButton btn_send;
-    EditText text_send;
-    TextView textView;
-    ImageView imageView;
+
+   @BindView( R.id.toolbar  ) Toolbar mtoolbar;
+   @BindView( R.id.recycler_view )  RecyclerView recyclerView;
+   @BindView( R.id.Emessage  )EditText text_send;
+   @BindView( R.id.text )  TextView textView;
+   @BindView( R.id.Image )  ImageView imageView;
 
     String ReceiverUserID,SenderID,Mobileno,Name,MessageID,timeStamp;
     MessageAdapter messageAdapter;
-    RecyclerView recyclerView;
     Context mcontext;
     List<Message> message1;
 
@@ -64,22 +66,15 @@ public class MessageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_message );
+        ButterKnife.bind( this );
+
         MessageID = Utils.generateRandomString( 16 );
         //Broadcast Receiver
         IntentFilter intentFilter = new IntentFilter( THIS_BROADCAST );
         registerReceiver( broadcastReceiver, intentFilter );
 
-        btn_send = findViewById( R.id.sender );
-        text_send = findViewById( R.id.Emessage );
-        textView = findViewById( R.id.text );
-        imageView = findViewById( R.id.Image );
-
-        //toolbar
-        mtoolbar = findViewById( R.id.toolbar );
         //messageRecyclerview
-        recyclerView = findViewById( R.id.recycler_view );
         recyclerView.setHasFixedSize( true );
-
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager( getApplicationContext() );
         linearLayoutManager.setStackFromEnd( true );
         linearLayoutManager.setReverseLayout( false );
@@ -96,8 +91,9 @@ public class MessageActivity extends AppCompatActivity {
         setupToolbar();
         if (ReceiverUserID.contains( "==" )) {
             ReceiverUserID = ReceiverUserID.replace( "==", "" );
-
         }
+        SharedPreferences preferences = getSharedPreferences( SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE );
+        SenderID = preferences.getString( LOOGED_IN_USER_ID, "" );
 
         //MessageAdapter
        /* messageAdapter = new MessageAdapter( MessageActivity.this, new ArrayList<Message>() );
@@ -105,8 +101,7 @@ public class MessageActivity extends AppCompatActivity {
 */
         DatabaseHelper databaseHelper=new DatabaseHelper( this );
         message1 = new ArrayList<>();
-        message1=databaseHelper.getConversionID( ReceiverUserID );
-
+        message1=databaseHelper.getConversionID( ReceiverUserID);
         messageAdapter = new MessageAdapter( MessageActivity.this, message1 );
         recyclerView.setAdapter( messageAdapter );
     }
@@ -119,25 +114,45 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     //onClick Listnar
+/*
+  @OnClick( R.id.sender ) void start(){
+      //scrollView
+      recyclerView.smoothScrollToPosition( text_send.getBottom() );
+      //Timestamp.
+      SimpleDateFormat sdf = new SimpleDateFormat( "h:mm a" );
+      timeStamp = sdf.format( new Date() );
+
+      String msg = text_send.getText().toString();
+      if (!msg.equals( "" )) {
+          //retrieve data from contactfragment
+          //https://www.journaldev.com/9412/android-shared-preferences-example-tutorial
+          // or hawk
+
+          sendMessage( SenderID, ReceiverUserID, msg ); //receiverside
+          senderMessage( SenderID, ReceiverUserID, MessageID, msg, timeStamp ); //sender side
+
+      } else {
+          Toast.makeText( MessageActivity.this, "You can't send empty message", Toast.LENGTH_SHORT ).show();
+      }
+      //"" this indicate the black
+      text_send.setText( "" );
+  }
+*/
     public void sendMessage(View view) {
         //scrollView
-        recyclerView.smoothScrollToPosition( text_send.getBottom() );
+    recyclerView.smoothScrollToPosition( text_send.getBottom() );
         //Timestamp.
         SimpleDateFormat sdf = new SimpleDateFormat( "h:mm a" );
         timeStamp = sdf.format( new Date() );
 
         String msg = text_send.getText().toString();
-
         if (!msg.equals( "" )) {
             //retrieve data from contactfragment
             //https://www.journaldev.com/9412/android-shared-preferences-example-tutorial
             // or hawk
-            SharedPreferences preferences = getSharedPreferences( SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE );
-            SenderID = preferences.getString( LOOGED_IN_USER_ID, "" );
+
             sendMessage( SenderID, ReceiverUserID, msg ); //receiverside
             senderMessage( SenderID, ReceiverUserID, MessageID, msg, timeStamp ); //sender side
-
-
 
         } else {
             Toast.makeText( MessageActivity.this, "You can't send empty message", Toast.LENGTH_SHORT ).show();

@@ -21,7 +21,7 @@
             android:padding="8dp"
             android:text="@string/hello"
             android:textColor="#000"
-            android:textSize="10pt" />
+            android:textSize="7pt" />
 
     </androidx.cardview.widget.CardView>
 

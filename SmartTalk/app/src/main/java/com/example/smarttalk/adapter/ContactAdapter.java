@@ -1,7 +1,6 @@
-package com.example.smarttalk.Adapter;
+package com.example.smarttalk.adapter;
 
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -14,26 +13,28 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.example.smarttalk.MessageActivity;
-import com.example.smarttalk.ModelClass.User;
 import com.example.smarttalk.R;
 import com.example.smarttalk.database.model.Contact;
 
 import java.util.List;
 
-public class MyRecyclerAdapter  extends RecyclerView.Adapter<MyRecyclerAdapter.ViewHolder>  {
-    private static final String TAG = "MyRecyclerAdapter";
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+
+public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder>  {
+    private static final String TAG = "ContactAdapter";
 public Context mcontext;
    // public List<User> users;
    public List<Contact> contacts;
     String s;
 
-    public MyRecyclerAdapter(Context context, List<Contact> contactmodel) {
+    public ContactAdapter(Context context, List<Contact> contactmodel) {
         mcontext=context;
         contacts=contactmodel;
     }
@@ -43,7 +44,7 @@ public Context mcontext;
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mcontext)
-                     .inflate( R.layout.activity_card_view, parent, false);
+                .inflate( R.layout.contact_card_view, parent, false);
         return new ViewHolder(view);
        // return new ViewHolder( LayoutInflater.from(mcontext).inflate( R.layout.card_view_activity, parent, false)); this is also one way
     }
@@ -53,10 +54,8 @@ public Context mcontext;
 
          // final User uploadCurrent = users.get( position );  //getter & Setter
           final  Contact mcontact=contacts.get( position );
-         // holder.Tname.setText( uploadCurrent.getFirstname().concat( uploadCurrent.getLastname() ) );
-          holder.Tname.setText( mcontact.getFirstName() +" "+ mcontact.getLastName()  );
-          Log.d( TAG, "onBindViewHolder: "+mcontact.getFirstName());
-          holder.Tnumber.setText( mcontact.getMobileNmuber() );
+          holder.listTextView.get( 0 ).setText( mcontact.getFirstName().concat( mcontact.getLastName()) );
+          holder.listTextView.get( 1 ).setText( mcontact.getMobileNmuber() );
 
           //color generator
           ColorGenerator generator=ColorGenerator.MATERIAL;    //color generator
@@ -88,16 +87,22 @@ public Context mcontext;
         return contacts.size();
     }
 
+    public void setContactList(List<Contact> contactList) {
+        if (contacts != null)
+            contacts.clear();
+
+        contacts = contactList;
+        notifyDataSetChanged();
+    }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-           TextView Tname,Tnumber;
-        ImageView image;
-        ViewHolder(@NonNull View itemView) {
+           @BindViews({R.id.name,R.id.number } ) List<TextView> listTextView ;
+           @BindView( R.id.image_view ) ImageView image;
+
+         ViewHolder(@NonNull View itemView) {
             super( itemView );
-            Log.d( TAG, "ViewHolder: "+itemView );
-            Tname=itemView.findViewById( R.id.name );
-            Tnumber=itemView.findViewById( R.id.number );
-             image = itemView.findViewById(R.id.image_view);
+           ButterKnife.bind( this,itemView );
+
 
         }
     }

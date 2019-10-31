@@ -59,6 +59,7 @@ public class AuthenticationActivity extends AppCompatActivity {
                     database();
                     Log.d( TAG, "PhoneNUMBER: " + number );
                     Toast.makeText( AuthenticationActivity.this, "User Signed In", Toast.LENGTH_SHORT ).show();
+
                 } else {
                     startActivityForResult(
                             AuthUI.getInstance()
@@ -133,4 +134,5 @@ public class AuthenticationActivity extends AppCompatActivity {
         super.onPause();
         mFirebaseAuth.removeAuthStateListener( mAuthStateListner );
     }
+
 }

@@ -13,5 +13,6 @@
     <string name="msg_subscribe_failed">unsubscribed</string>
     <string name="type_a_message">Type a message</string>
     <string name="hello">hello</string>
+    <string name="registration">registration</string>
 
 </resources>
