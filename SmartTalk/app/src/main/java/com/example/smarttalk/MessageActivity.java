@@ -16,20 +16,18 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.smarttalk.adapter.MessageAdapter;
+import com.example.smarttalk.databasehelper.DatabaseHelper;
 import com.example.smarttalk.retrofit.BaseApplication;
 import com.example.smarttalk.retrofit.Data;
 import com.example.smarttalk.retrofit.FCMAPI;
 import com.example.smarttalk.retrofit.MessageEntity;
 import com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant;
-import com.example.smarttalk.database.databasehelper.DatabaseHelper;
-import com.example.smarttalk.database.model.Message;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.smarttalk.modelclass.Message;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +36,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;

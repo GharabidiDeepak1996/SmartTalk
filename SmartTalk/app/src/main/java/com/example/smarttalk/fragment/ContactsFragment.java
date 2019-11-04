@@ -16,11 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.smarttalk.adapter.ContactAdapter;
+import com.example.smarttalk.databasehelper.DatabaseHelper;
 import com.example.smarttalk.modelclass.User;
 import com.example.smarttalk.R;
 import com.example.smarttalk.constants.AppConstant;
-import com.example.smarttalk.database.databasehelper.DatabaseHelper;
-import com.example.smarttalk.database.model.Contact;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -50,7 +49,7 @@ public class ContactsFragment extends Fragment {
     private SharedPreferences mPreference;
     private String FirstName, LastName, MobileNumber, UserID;
     DatabaseHelper databaseHelper;
-    private List<Contact> contactmodel;
+    private List<User> contactmodel;
 
     private static final String TAG = "ContactsFragment";
     //private static final String TAG = "MyFirebaseMessagingServ";
@@ -93,7 +92,7 @@ public class ContactsFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d( TAG, "onDataChange 1: " + dataSnapshot );
                 //iterating through all the values in database
-                List<Contact> contactList = new ArrayList<>(  );
+                List<User> contactList = new ArrayList<>(  );
 
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     //all the user id will access here in userID
@@ -116,11 +115,11 @@ public class ContactsFragment extends Fragment {
                         MobileNumber = user.getMobilenumber();
                         Log.d( TAG, "onDataChange: 0+"+MobileNumber );
                         //Offline data will save in databas
-                        Contact contact = new Contact();
-                        contact.setUserID( UserID );
-                        contact.setFirstName( FirstName );
-                        contact.setLastName( LastName );
-                        contact.setMobileNmuber( MobileNumber );
+                        User contact = new User();
+                        contact.setUserId( UserID );
+                        contact.setFirstname( FirstName );
+                        contact.setLastname( LastName );
+                        contact.setMobilenumber( MobileNumber );
                         Log.d( TAG, "UserID: "+UserID );
                         databaseHelper.insert( contact );
                         contactList.add( contact );

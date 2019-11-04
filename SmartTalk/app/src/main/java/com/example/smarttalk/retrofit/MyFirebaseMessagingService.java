@@ -4,8 +4,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.smarttalk.database.databasehelper.DatabaseHelper;
-import com.example.smarttalk.database.model.Message;
+import com.example.smarttalk.databasehelper.DatabaseHelper;
+import com.example.smarttalk.modelclass.Message;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 

@@ -1,4 +1,4 @@
-package com.example.smarttalk.database.databasehelper;
+package com.example.smarttalk.databasehelper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,9 +10,9 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.smarttalk.database.model.Chat;
-import com.example.smarttalk.database.model.Contact;
-import com.example.smarttalk.database.model.Message;
+import com.example.smarttalk.modelclass.Chat;
+import com.example.smarttalk.modelclass.Message;
+import com.example.smarttalk.modelclass.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,33 +110,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Intent intent = new Intent( THIS_BROADCAST );
         intent.putExtra( "MessageID", message.getMessageID() );
         intent.putExtra( "ConversionID", message.getConversionID() );
-
+        context.sendBroadcast( intent );
         //Make chatlist model data from message data
         Chat chat = new Chat();
         chat.unseencount = 0;
         chat.message = message;
         insertChats( chat );
-        context.sendBroadcast( intent );
+
     }
 
 
     //contact
-    public void insert(Contact contact) {
+    public void insert(User contact) {
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put( Contacts.USER_ID, contact.getUserID() );
-        Log.d( TAG, "Contacts.USER_ID " + contact.getUserID() );
-        contentValues.put( Contacts.FIRST_NAME, contact.getFirstName() );
-        contentValues.put( Contacts.LAST_NAME, contact.getLastName() );
-        contentValues.put( Contacts.MOBILE_NUMBER, contact.getMobileNmuber() );
+        contentValues.put( Contacts.USER_ID, contact.getUserId() );
+        contentValues.put( Contacts.FIRST_NAME, contact.getFirstname() );
+        contentValues.put( Contacts.LAST_NAME, contact.getLastname() );
+        contentValues.put( Contacts.MOBILE_NUMBER, contact.getMobilenumber() );
         // long row = database.insertWithOnConflict( Contacts.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE );
         long row = database.insertWithOnConflict( Contacts.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE );
 
         Log.d( TAG, "Inside insertStudent() -> Row : " + row );
     }
 
-    public List<Contact> display() {
-        List<Contact> ContactList = new ArrayList<>();
+    public List<User> display() {
+        List<User> ContactList = new ArrayList<>();
         String query = "SELECT * FROM " + Contacts.TABLE_NAME;
 
         SQLiteDatabase database = this.getReadableDatabase();
@@ -146,17 +145,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Student student1=null; optional
 
         while (cursor.moveToNext()) {
-            Contact contact = new Contact();
+            User contact = new User();
             String user_id = cursor.getString( cursor.getColumnIndex( Contacts.USER_ID ) );
             String first_name = cursor.getString( cursor.getColumnIndex( Contacts.FIRST_NAME ) );
             String last_name = cursor.getString( cursor.getColumnIndex( Contacts.LAST_NAME ) );
             String mobile_number = cursor.getString( cursor.getColumnIndex( Contacts.MOBILE_NUMBER ) );
 
             Log.d( TAG, "display:First Name: " + first_name + ",Lastname: " + last_name + ",Mobilenumber :" + mobile_number );
-            contact.setUserID( user_id );
-            contact.setFirstName( first_name );
-            contact.setLastName( last_name );
-            contact.setMobileNmuber( mobile_number );
+            contact.setUserId( user_id );
+            contact.setFirstname( first_name );
+            contact.setLastname( last_name );
+            contact.setMobilenumber( mobile_number );
 
             stringBuffer.append( contact );
             ContactList.add( contact );
@@ -257,10 +256,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String messageID = cursor.getString( cursor.getColumnIndex( Chats.MessageID ) );
 
             chat.setChatID( Integer.parseInt( chatId ) );
-            chat.setMessageId( messageID);
-            chat.setConversionID( conversionId );
-           /* chat.message.setConversionID( conversionId);
-            chat.message.setMessageID(messageID);*/
+            Message message = new Message();
+            message.setConversionID( conversionId );
+            message.setMessageID( messageID );
+            message.setBody(cursor.getString( cursor.getColumnIndex( Messages.Body ) )  );
+            message.setTimeStamp( cursor.getString( cursor.getColumnIndex( Messages.TimeStamp ) ) );
+            chat.message = message;
+
+            User mUser=new User();
+            mUser.setFirstname( cursor.getString( cursor.getColumnIndex(Contacts.FIRST_NAME  ) ) );
+            mUser.setLastname(cursor.getString( cursor.getColumnIndex(Contacts.LAST_NAME ) )  );
+            mUser.setUserId( cursor.getString( cursor.getColumnIndex(Contacts.USER_ID )));
+            chat.user= mUser;
             chatList.add( chat );
         }
         cursor.close();

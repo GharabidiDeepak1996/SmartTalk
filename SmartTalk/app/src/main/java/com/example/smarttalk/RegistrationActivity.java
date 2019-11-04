@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.smarttalk.modelclass.RModelClass;
+import com.example.smarttalk.modelclass.User;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -26,7 +26,7 @@ import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConsta
 public class RegistrationActivity extends AppCompatActivity {
     private static final String TAG = "RegistrationActivity";
 
-    RModelClass modelclass;
+    User modelclass;
     String mobilenumber;
     DatabaseReference myRef;
     FirebaseDatabase database;
@@ -42,11 +42,11 @@ String UserID;
 
         mobilenumber=getIntent().getStringExtra( "MobileNumber" );
         UserID=getIntent().getStringExtra( "UserID" );
-        modelclass = new RModelClass();
+        modelclass = new User();
     }
 
     private void getValues() {
-        modelclass.setUserID( UserID );
+        modelclass.setUserId( UserID );
         String firstname=ListEditText.get( 0 ).getText().toString();
         // Create firstname a char array of given String
         char cfname[] = firstname.toCharArray();

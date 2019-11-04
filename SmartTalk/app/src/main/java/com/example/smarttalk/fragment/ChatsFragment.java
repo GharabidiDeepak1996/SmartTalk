@@ -1,20 +1,24 @@
 package com.example.smarttalk.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.smarttalk.adapter.ChatAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.smarttalk.R;
-import com.example.smarttalk.database.databasehelper.DatabaseHelper;
-import com.example.smarttalk.database.model.Chat;
+import com.example.smarttalk.adapter.ChatAdapter;
+import com.example.smarttalk.databasehelper.DatabaseHelper;
+import com.example.smarttalk.modelclass.Chat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +26,18 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.example.smarttalk.MessageActivity.THIS_BROADCAST;
+
+
 public class ChatsFragment extends Fragment {
     private static final String TAG = "ChatsFragment";
     @BindView( R.id.chat_recycler_view ) RecyclerView mrecyclerview;
     List<Chat> mchat;
+    Boolean isExists;
+    ChatAdapter chatAdapter;
+
+    int indexToRemove;
+
 
     public ChatsFragment() {
         // Required empty public constructor
@@ -35,11 +47,15 @@ public class ChatsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view=inflater.inflate( R.layout.fragment_chats, container, false );
         ButterKnife.bind( this,view );
-
+        IntentFilter intentFilter = new IntentFilter( THIS_BROADCAST );
+        getActivity().registerReceiver( broadcastReceiver, intentFilter );
 
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager( getActivity() );
         mrecyclerview.setLayoutManager(linearLayoutManager  );
         mrecyclerview.setHasFixedSize( true );
+        //line divider bewt the cardview
+        DividerItemDecoration itemDecor = new DividerItemDecoration( getActivity(), linearLayoutManager.getOrientation() );
+        mrecyclerview.addItemDecoration( itemDecor );
 
        // context=container.getContext();
         DatabaseHelper databaseHelper=new DatabaseHelper( container.getContext());
@@ -49,7 +65,31 @@ public class ChatsFragment extends Fragment {
 
         ChatAdapter mchatAdapter=new ChatAdapter(getActivity(),mchat);
         mrecyclerview.setAdapter( mchatAdapter);
-
         return view;
+    }
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            String ConversionID = bundle.getString( "ConversionID" );
+            String MessageID = bundle.getString( "MessageID" );
+            Receiver(ConversionID,MessageID);
+        }
+    };
+public void Receiver(String ConversionID,String MessageID){
+    for (Chat chat : mchat){
+
+        if (chat.message.getConversionID().equals( ConversionID)){
+            isExists=true;
+            //mchat.
+           // chatAdapter.;
+            break;
+        }
+    }
+}
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+       getActivity().unregisterReceiver( broadcastReceiver );
     }
 }

@@ -4,7 +4,6 @@ package com.example.smarttalk.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.example.smarttalk.MessageActivity;
 import com.example.smarttalk.R;
-import com.example.smarttalk.database.model.Contact;
+import com.example.smarttalk.modelclass.User;
 
 import java.util.List;
 
@@ -31,10 +30,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     private static final String TAG = "ContactAdapter";
 public Context mcontext;
    // public List<User> users;
-   public List<Contact> contacts;
+   public List<User> contacts;
     String s;
 
-    public ContactAdapter(Context context, List<Contact> contactmodel) {
+    public ContactAdapter(Context context, List<User> contactmodel) {
         mcontext=context;
         contacts=contactmodel;
     }
@@ -53,13 +52,13 @@ public Context mcontext;
         public void onBindViewHolder( ViewHolder holder, int position) {
 
          // final User uploadCurrent = users.get( position );  //getter & Setter
-          final  Contact mcontact=contacts.get( position );
-          holder.listTextView.get( 0 ).setText( mcontact.getFirstName().concat( mcontact.getLastName()) );
-          holder.listTextView.get( 1 ).setText( mcontact.getMobileNmuber() );
+          final  User mcontact=contacts.get( position );
+          holder.listTextView.get( 0 ).setText( mcontact.getFirstname().concat( mcontact.getLastname()) );
+          holder.listTextView.get( 1 ).setText( mcontact.getMobilenumber());
 
           //color generator
           ColorGenerator generator=ColorGenerator.MATERIAL;    //color generator
-          String x=mcontact.getFirstName();
+          String x=mcontact.getFirstname();
           String[] myName = x.split(" ");
           for (int i = 0; i < myName.length; i++) {
                s = myName[i];
@@ -73,9 +72,9 @@ public Context mcontext;
               @Override
               public void onClick(View view) {
                   Intent intent = new Intent( mcontext, MessageActivity.class );
-                  intent.putExtra( "ReceiverUserID", mcontact.getUserID() );
-                  intent.putExtra( "number",mcontact.getMobileNmuber());
-                  intent.putExtra( "name", mcontact.getFirstName() + " " + mcontact.getLastName() );
+                  intent.putExtra( "ReceiverUserID", mcontact.getUserId() );
+                  intent.putExtra( "number",mcontact.getMobilenumber());
+                  intent.putExtra( "name", mcontact.getFirstname() + " " + mcontact.getLastname());
                   mcontext.startActivity( intent );
               }
           });
@@ -87,7 +86,7 @@ public Context mcontext;
         return contacts.size();
     }
 
-    public void setContactList(List<Contact> contactList) {
+    public void setContactList(List<User> contactList) {
         if (contacts != null)
             contacts.clear();
 

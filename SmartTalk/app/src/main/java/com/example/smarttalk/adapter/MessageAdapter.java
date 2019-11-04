@@ -12,11 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.smarttalk.R;
 import com.example.smarttalk.constants.AppConstant;
-import com.example.smarttalk.database.model.Message;
+import com.example.smarttalk.modelclass.Message;
 
 import java.util.List;
 
-import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 

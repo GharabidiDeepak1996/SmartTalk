@@ -1,4 +1,4 @@
-package com.example.smarttalk.database.model;
+package com.example.smarttalk.modelclass;
 
 public class Message {
     private String SenderID;
