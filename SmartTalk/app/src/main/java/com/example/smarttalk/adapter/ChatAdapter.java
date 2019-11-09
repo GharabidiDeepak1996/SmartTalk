@@ -16,6 +16,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.example.smarttalk.MessageActivity;
 import com.example.smarttalk.R;
+import com.example.smarttalk.fragment.ChatsFragment;
 import com.example.smarttalk.modelclass.Chat;
 
 import java.util.List;
@@ -76,6 +77,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
             }
         } );
 
+    }
+
+    public void updateChatList(Chat chat, int indexToRemove, boolean isAlreaduExits) {
+        Log.d( TAG, "isAlreaduExits: "+isAlreaduExits );
+        if(isAlreaduExits){
+            mchat.remove( indexToRemove);
+        }
+        mchat.add( 0, chat );
+        notifyDataSetChanged();
     }
 
     @Override

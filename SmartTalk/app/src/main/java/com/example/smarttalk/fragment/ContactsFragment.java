@@ -70,6 +70,7 @@ public class ContactsFragment extends Fragment {
 //line divider bewt the cardview
         DividerItemDecoration itemDecor = new DividerItemDecoration( getActivity(), linearLayoutManager.getOrientation() );
         recyclerView.addItemDecoration( itemDecor );
+        Log.d( TAG, "Context: "+getActivity() );
 //sharedpreferences
         mContext = getActivity();
         mPreference = mContext.getSharedPreferences( AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE );
@@ -128,6 +129,7 @@ public class ContactsFragment extends Fragment {
                         checkForCurrentLoggedInUser( user );
                     }
                 }
+                //fetch first time
                 mfetchAdapter.setContactList( contactList );
             }
 

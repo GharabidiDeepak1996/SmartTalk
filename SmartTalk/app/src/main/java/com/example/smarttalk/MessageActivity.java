@@ -64,7 +64,7 @@ public class MessageActivity extends AppCompatActivity {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_message );
         ButterKnife.bind( this );
-
+        Log.d( TAG, "Context5645: "+mcontext );
         MessageID = Utils.generateRandomString( 16 );
         //Broadcast Receiver
         IntentFilter intentFilter = new IntentFilter( THIS_BROADCAST );
@@ -110,31 +110,6 @@ public class MessageActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator( R.drawable.ic_arrow_back_black_24dp );
     }
 
-    //onClick Listnar
-/*
-  @OnClick( R.id.sender ) void start(){
-      //scrollView
-      recyclerView.smoothScrollToPosition( text_send.getBottom() );
-      //Timestamp.
-      SimpleDateFormat sdf = new SimpleDateFormat( "h:mm a" );
-      timeStamp = sdf.format( new Date() );
-
-      String msg = text_send.getText().toString();
-      if (!msg.equals( "" )) {
-          //retrieve data from contactfragment
-          //https://www.journaldev.com/9412/android-shared-preferences-example-tutorial
-          // or hawk
-
-          sendMessage( SenderID, ReceiverUserID, msg ); //receiverside
-          senderMessage( SenderID, ReceiverUserID, MessageID, msg, timeStamp ); //sender side
-
-      } else {
-          Toast.makeText( MessageActivity.this, "You can't send empty message", Toast.LENGTH_SHORT ).show();
-      }
-      //"" this indicate the black
-      text_send.setText( "" );
-  }
-*/
     public void sendMessage(View view) {
         //scrollView
     recyclerView.smoothScrollToPosition( text_send.getBottom() );
@@ -199,12 +174,12 @@ public class MessageActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             mcontext=context;
-
             Bundle bundle = intent.getExtras();
             String MessageID = bundle.getString( "MessageID" );
 
             //Get message data from database using messageId
             DatabaseHelper handler = new DatabaseHelper( context );
+            Log.d( TAG, "context158: "+context );
             Message message =  handler.getMessageById( MessageID );
             messageAdapter.addMessageToAdapter( message );
 

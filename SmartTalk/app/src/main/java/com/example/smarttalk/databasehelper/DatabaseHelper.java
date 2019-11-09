@@ -21,7 +21,7 @@ import static com.example.smarttalk.MessageActivity.THIS_BROADCAST;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "smarttalk.db";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     private static final String TAG = "DatabaseHelper";
     Context context;
 
@@ -48,6 +48,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public static final String MessageID = "MESSAGEID";
         public static final String Body = "BODY";
         public static final String TimeStamp = "TIMESTAMP";
+        public static  final String newcol="jhdsgf";
     }
 
     public class Chats {
@@ -77,6 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + Messages.MessageID + " TEXT, "
                 + Messages.Body + " TEXT, "
                 + Messages.TimeStamp + " TEXT"
+                + Messages.newcol+ "TEXT"
                 + ")";
         sqLiteDatabase.execSQL( Messagesquery );
 
@@ -106,7 +108,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long row = db.insertWithOnConflict( Messages.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE );
 
         Log.d( TAG, "insert row: " + row );
-
         Intent intent = new Intent( THIS_BROADCAST );
         intent.putExtra( "MessageID", message.getMessageID() );
         intent.putExtra( "ConversionID", message.getConversionID() );
@@ -229,8 +230,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put( Chats.conversionID, chat.message.getConversionID() );
         contentValues.put( Chats.MessageID, chat.message.getMessageID() );
-         long row = database.insertWithOnConflict( Chats.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE );
-       // long row = database.insertWithOnConflict( Chats.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE );
+        long row = database.insertWithOnConflict( Chats.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE );
+        // long row = database.insertWithOnConflict( Chats.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE );
         Log.d( TAG, "insertChats: " + row );
     }
 
@@ -241,12 +242,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " JOIN " + Contacts.TABLE_NAME +
                 " ON " + Contacts.USER_ID + " = " + Chats.TABLE_NAME + "." + Chats.conversionID +
                 " JOIN " + Messages.TABLE_NAME +
-                " ON " + Messages.TABLE_NAME + "." + Messages.MessageID + " = " + Chats.TABLE_NAME + "." + Chats.MessageID
+                " ON " + Messages.TABLE_NAME + "." + Messages.MessageID + " = " + Chats.TABLE_NAME + "." + Chats.MessageID +
+                " ORDER BY " +Messages.TimeStamp+ " DESC"
                 + " ;";
-        Log.d( TAG, " Query : " + query );
+        Log.d( TAG, " chatList() ==> Query : " + query );
 
         Cursor cursor = database.rawQuery( query, null );
-        Log.d( TAG, "cursor_count: " + cursor.getCount() );
+        Log.d( TAG, "chatList() ==>> cursor_count: " + cursor.getCount() );
         List<Chat> chatList = new ArrayList<>();
 
         while (cursor.moveToNext()) {
@@ -259,15 +261,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Message message = new Message();
             message.setConversionID( conversionId );
             message.setMessageID( messageID );
-            message.setBody(cursor.getString( cursor.getColumnIndex( Messages.Body ) )  );
+            message.setBody( cursor.getString( cursor.getColumnIndex( Messages.Body ) ) );
             message.setTimeStamp( cursor.getString( cursor.getColumnIndex( Messages.TimeStamp ) ) );
             chat.message = message;
 
-            User mUser=new User();
-            mUser.setFirstname( cursor.getString( cursor.getColumnIndex(Contacts.FIRST_NAME  ) ) );
-            mUser.setLastname(cursor.getString( cursor.getColumnIndex(Contacts.LAST_NAME ) )  );
-            mUser.setUserId( cursor.getString( cursor.getColumnIndex(Contacts.USER_ID )));
-            chat.user= mUser;
+            User mUser = new User();
+            mUser.setFirstname( cursor.getString( cursor.getColumnIndex( Contacts.FIRST_NAME ) ) );
+            mUser.setLastname( cursor.getString( cursor.getColumnIndex( Contacts.LAST_NAME ) ) );
+            mUser.setUserId( cursor.getString( cursor.getColumnIndex( Contacts.USER_ID ) ) );
+            chat.user = mUser;
             chatList.add( chat );
         }
         cursor.close();
@@ -275,8 +277,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public Chat getChatByConversationId(String conversionID) {
+        Log.d( TAG, "getChatByConversationId: " + conversionID );
+
+        SQLiteDatabase database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + Chats.TABLE_NAME +
+                " JOIN " + Contacts.TABLE_NAME +
+                " ON " + Contacts.USER_ID + " = " + Chats.TABLE_NAME + "." + Chats.conversionID +
+                " JOIN " + Messages.TABLE_NAME +
+                " ON " + Messages.TABLE_NAME + "." + Messages.MessageID + " = " + Chats.TABLE_NAME + "." + Chats.MessageID + " WHERE " + Chats.TABLE_NAME + "." + Chats.conversionID + " ='" + conversionID + "';";
+        Log.d( TAG, " Query : " + query );
+
+        Cursor cursor = database.rawQuery( query, null );
+        Log.d( TAG, "getChatByConversationId() ==> cursor_count: " + cursor.getCount() );
+        cursor.moveToFirst();
+        Chat chat = new Chat();
+        String chatId = cursor.getString( cursor.getColumnIndex( Chats.CHAT_ID ) );
+        String conversionId = cursor.getString( cursor.getColumnIndex( Chats.conversionID ) );
+        String messageID = cursor.getString( cursor.getColumnIndex( Chats.MessageID ) );
+
+        chat.setChatID( Integer.parseInt( chatId ) );
+        Message message = new Message();
+        message.setConversionID( conversionId );
+        message.setMessageID( messageID );
+        message.setBody( cursor.getString( cursor.getColumnIndex( Messages.Body ) ) );
+        message.setTimeStamp( cursor.getString( cursor.getColumnIndex( Messages.TimeStamp ) ) );
+        chat.message = message;
+
+        User mUser = new User();
+        mUser.setFirstname( cursor.getString( cursor.getColumnIndex( Contacts.FIRST_NAME ) ) );
+        mUser.setLastname( cursor.getString( cursor.getColumnIndex( Contacts.LAST_NAME ) ) );
+        mUser.setUserId( cursor.getString( cursor.getColumnIndex( Contacts.USER_ID ) ) );
+        chat.user = mUser;
+        cursor.close();
+        return chat;
 
     }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        // If you need to add a column
+        if (newVersion > oldVersion) {
+            sqLiteDatabase.execSQL("ALTER TABLE "+Messages.TABLE_NAME+" ADD COLUMN "+Messages.newcol+ " String");
+
+    }
+}
 }

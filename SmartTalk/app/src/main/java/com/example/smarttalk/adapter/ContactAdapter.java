@@ -4,6 +4,7 @@ package com.example.smarttalk.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ public Context mcontext;
     public ContactAdapter(Context context, List<User> contactmodel) {
         mcontext=context;
         contacts=contactmodel;
+        Log.d( TAG, "context12: "+context );
     }
 
 
