@@ -78,13 +78,12 @@ public class ChatsFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
             String ConversionID = bundle.getString( "ConversionID" );
-            String MessageID = bundle.getString( "MessageID" );
             Log.d( TAG, "conversion12: " + ConversionID );
-            Receiver( ConversionID, MessageID );
+            Receiver( ConversionID);
         }
     };
 
-    public void Receiver(String ConversionID, String MessageID) {
+    public void Receiver(String ConversionID) {
      DatabaseHelper databaseHelper=new DatabaseHelper( getActivity() );
 
        Chat currentChat = databaseHelper.getChatByConversationId(  ConversionID);

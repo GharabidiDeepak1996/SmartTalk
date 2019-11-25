@@ -1,6 +1,7 @@
 package com.example.smarttalk.retrofit;
 
 public class Data {
+    public String Name;
     public String MessageID;
     public String SenderID;
     public String ReceiverID;

@@ -145,6 +145,7 @@ public class MessageActivity extends AppCompatActivity {
         data.Body = messageBody;
         data.MessageID = MessageID;
         data.TimeStamp = timeStamp;
+        data.Name=Name;
 
         MessageEntity messageEntity = new MessageEntity();
         messageEntity.data = data;

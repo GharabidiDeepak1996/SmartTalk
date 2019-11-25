@@ -1,7 +1,10 @@
 package com.example.smarttalk.fragment;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -63,6 +66,13 @@ public class ContactsFragment extends Fragment {
 
         View view = inflater.inflate( R.layout.fragment_contacts, container, false );
         ButterKnife.bind( this,view );
+
+        //Notification ChannelID
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel( "mynotification", "mynotification", NotificationManager.IMPORTANCE_DEFAULT );
+            NotificationManager notificationManager = getActivity().getSystemService( NotificationManager.class );
+            notificationManager.createNotificationChannel( channel );
+        }
 
         recyclerView.setHasFixedSize( true ); //setHasFixedSize to true when changing the contents of the adapter does not change it's height or the width.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager( getActivity() );
