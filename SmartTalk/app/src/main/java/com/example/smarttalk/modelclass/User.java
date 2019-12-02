@@ -1,6 +1,8 @@
 package com.example.smarttalk.modelclass;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private static final String TAG = "User";
     private String userId;
     private String firstname;

@@ -63,6 +63,9 @@ dependencies {
 
 //searchview
     implementation 'com.miguelcatalan:materialsearchview:1.4.0'
+   //automatically handle clicks on the Home/Up button
+    implementation 'com.nineoldandroids:library:2.4.0'
+
 }
 //firebase
 apply plugin: 'com.google.gms.google-services'

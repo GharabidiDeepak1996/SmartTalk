@@ -1,6 +1,8 @@
 package com.example.smarttalk.modelclass;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable {
     private String SenderID;
     private String conversionID;
     private String MessageID;

@@ -29,6 +29,7 @@ import com.example.smarttalk.retrofit.MessageEntity;
 import com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant;
 import com.example.smarttalk.modelclass.Message;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -86,8 +87,12 @@ public class MessageActivity extends AppCompatActivity {
         imageView.setImageResource( R.mipmap.ic_launcher );
 
         setupToolbar();
-        if (ReceiverUserID.contains( "==" )) {
-            ReceiverUserID = ReceiverUserID.replace( "==", "" );
+        try {
+            if (ReceiverUserID.contains( "==" )) {
+                ReceiverUserID = ReceiverUserID.replace( "==", "" );
+            }
+        }catch (Exception e){
+            Log.d( TAG, "onCreate: "+e );
         }
         SharedPreferences preferences = getSharedPreferences( SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE );
         SenderID = preferences.getString( LOOGED_IN_USER_ID, "" );
@@ -183,6 +188,10 @@ public class MessageActivity extends AppCompatActivity {
             Log.d( TAG, "context158: "+context );
             Message message =  handler.getMessageById( MessageID );
             messageAdapter.addMessageToAdapter( message );
+/*
+            intent.putExtra( "list", message );
+
+            Message serilazedData = ( Message ) intent.getSerializableExtra( "list" );*/
 
         }
     };

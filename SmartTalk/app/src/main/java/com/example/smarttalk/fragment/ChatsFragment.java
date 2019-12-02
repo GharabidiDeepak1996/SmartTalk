@@ -39,19 +39,15 @@ public class ChatsFragment extends Fragment {
     DatabaseHelper databaseHelper;
     ChatAdapter chatAdapter;
 
-    int indexToRemove;
 
     ChatAdapter mChatAdapter;
 
-
-    public ChatsFragment() {
-        // Required empty public constructor
-    }
-
+    public static final String THIS_BROADCAST_FOR_SEARCHBAR = "this is for searchBar";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate( R.layout.fragment_chats, container, false );
         ButterKnife.bind( this, view );
+        //chat
         IntentFilter intentFilter = new IntentFilter( THIS_BROADCAST );
         getActivity().registerReceiver( broadcastReceiver, intentFilter );
 
@@ -85,22 +81,48 @@ public class ChatsFragment extends Fragment {
 
     public void Receiver(String ConversionID) {
      DatabaseHelper databaseHelper=new DatabaseHelper( getActivity() );
+try {
+    Chat currentChat = databaseHelper.getChatByConversationId( ConversionID );
+    for (Chat chat : mchat) {
 
-       Chat currentChat = databaseHelper.getChatByConversationId(  ConversionID);
-        for (Chat chat : mchat) {
-
-            if (chat.message.getConversionID().equals( ConversionID )) {
-                isExists = true;
-                indexToremove = mchat.indexOf( chat );
-                Log.d( TAG, "Receiver153: " + indexToremove );
-                break;
-            }
-
+        if (chat.message.getConversionID().equals( ConversionID )) {
+            isExists = true;
+            indexToremove = mchat.indexOf( chat );
+            Log.d( TAG, "Receiver153: " + indexToremove );
+            break;
         }
 
-        Log.d( TAG, "Final Indext to update: " + indexToremove );
-       mChatAdapter.updateChatList( currentChat, indexToRemove, isExists );
+    }
 
+    Log.d( TAG, "Final Indext to update: " + indexToremove );
+    mChatAdapter.updateChatList( currentChat, indexToremove, isExists );
+}catch (Exception e){
+
+}
+
+    }
+private BroadcastReceiver broadcastforsearchbar=new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+
+
+        List<Chat> data = ( List<Chat> ) intent.getSerializableExtra( "data" );
+        mChatAdapter.setCollection( data );
+        Log.d( TAG, "onReceive: "+data );
+    }
+};
+    @Override
+    public void onResume() {
+        super.onResume();
+        //search
+        IntentFilter intentFilter1=new IntentFilter( THIS_BROADCAST_FOR_SEARCHBAR );
+        getActivity().registerReceiver( broadcastforsearchbar,intentFilter1 );
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver( broadcastforsearchbar);
     }
 
     @Override

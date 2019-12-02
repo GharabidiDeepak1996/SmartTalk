@@ -88,6 +88,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
         notifyDataSetChanged();
     }
 
+    public void setCollection(List<Chat> chatCollection) {
+        mchat = chatCollection;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return mchat.size();

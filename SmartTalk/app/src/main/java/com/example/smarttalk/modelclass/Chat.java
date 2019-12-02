@@ -1,6 +1,8 @@
 package com.example.smarttalk.modelclass;
 
-public class Chat {
+import java.io.Serializable;
+
+public class Chat implements Serializable {
     public int unseencount;
     public int chatID;
     public Message message ;

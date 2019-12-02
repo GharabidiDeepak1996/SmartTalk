@@ -14,10 +14,12 @@ import com.example.smarttalk.modelclass.Chat;
 import com.example.smarttalk.modelclass.Message;
 import com.example.smarttalk.modelclass.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.smarttalk.MessageActivity.THIS_BROADCAST;
+import static com.example.smarttalk.fragment.ChatsFragment.THIS_BROADCAST_FOR_SEARCHBAR;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "smarttalk.db";
@@ -312,6 +314,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return chat;
 
+    }
+
+    public void search(String searchquery){
+        SQLiteDatabase database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + Chats.TABLE_NAME +
+                " JOIN " + Contacts.TABLE_NAME +
+                " ON " + Contacts.USER_ID + " = " + Chats.TABLE_NAME + "." + Chats.conversionID +
+                " JOIN " + Messages.TABLE_NAME +
+                " ON " + Messages.TABLE_NAME + "." + Messages.MessageID + " = " + Chats.TABLE_NAME + "." + Chats.MessageID +
+                " WHERE " +Contacts.FIRST_NAME+ " LIKE '%" + searchquery + "%'"
+                + " ;";
+        Log.d( TAG, " Query : " + query );
+        Cursor cursor = database.rawQuery( query , null);
+        List<Chat> list=new ArrayList<>(  );
+        Chat chat = new Chat();
+        while (cursor.moveToNext()) {
+
+            String chatId = cursor.getString( cursor.getColumnIndex( Chats.CHAT_ID ) );
+            String conversionId = cursor.getString( cursor.getColumnIndex( Chats.conversionID ) );
+            String messageID = cursor.getString( cursor.getColumnIndex( Chats.MessageID ) );
+
+            chat.setChatID( Integer.parseInt( chatId ) );
+            Message message = new Message();
+            message.setConversionID( conversionId );
+            message.setMessageID( messageID );
+            message.setBody( cursor.getString( cursor.getColumnIndex( Messages.Body ) ) );
+            message.setTimeStamp( cursor.getString( cursor.getColumnIndex( Messages.TimeStamp ) ) );
+            chat.message = message;
+
+            User mUser = new User();
+            mUser.setFirstname( cursor.getString( cursor.getColumnIndex( Contacts.FIRST_NAME ) ) );
+            mUser.setLastname( cursor.getString( cursor.getColumnIndex( Contacts.LAST_NAME ) ) );
+            mUser.setUserId( cursor.getString( cursor.getColumnIndex( Contacts.USER_ID ) ) );
+            chat.user = mUser;
+            list.add( chat );
+        }
+        Log.d( TAG, "listsize: "+list.size() );
+
+        Intent intent=new Intent( THIS_BROADCAST_FOR_SEARCHBAR );
+       intent.putExtra( "data", ( Serializable ) list);
+        context.sendBroadcast( intent );
     }
 
     @Override
