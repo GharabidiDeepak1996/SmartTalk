@@ -30,7 +30,7 @@ public class AuthenticationActivity extends AppCompatActivity {
     private static final String TAG = "AuthenticationActivity";
    // public static final String PREFERENCE_NAME = "mydata";
     String UserID;
-
+    FirebaseDatabase database;
 
     String number;
         private FirebaseAuth mFirebaseAuth;
@@ -58,7 +58,6 @@ public class AuthenticationActivity extends AppCompatActivity {
                     number = user.getPhoneNumber();
                     database();
                     Log.d( TAG, "PhoneNUMBER: " + number );
-                    Toast.makeText( AuthenticationActivity.this, "User Signed In", Toast.LENGTH_SHORT ).show();
 
                 } else {
                     startActivityForResult(
@@ -73,6 +72,8 @@ public class AuthenticationActivity extends AppCompatActivity {
                 }
             }
         };
+        database=FirebaseDatabase.getInstance();
+        database.setPersistenceEnabled( true );
     }
 
     public void database() {
@@ -80,9 +81,9 @@ public class AuthenticationActivity extends AppCompatActivity {
         Log.d( TAG, "database: " + user );
         //Base64
         final byte[] encoded = Base64.encode(user.getBytes(), Base64.DEFAULT );
-       /* FirebaseDatabase database=FirebaseDatabase.getInstance();
-        DatabaseReference myRef=database.getReference("User");*/
-        DatabaseReference myRef=FirebaseDatabase.getInstance().getReference("User");
+         database=FirebaseDatabase.getInstance();
+        DatabaseReference myRef=database.getReference("User");
+     //   DatabaseReference myRef=FirebaseDatabase.getInstance().getReference("User");
         //unique ID will get.
          UserID=myRef.push().getKey();
         myRef.addListenerForSingleValueEvent( new ValueEventListener() {
@@ -113,7 +114,6 @@ public class AuthenticationActivity extends AppCompatActivity {
                     intent.putExtra( "UserID",UserID );
                     intent.putExtra( "MobileNumber",user);
                     startActivity( intent );
-
                 }
             }
             @Override

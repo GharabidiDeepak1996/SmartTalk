@@ -2,7 +2,10 @@ package com.example.smarttalk.fragment;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -53,6 +56,7 @@ public class ContactsFragment extends Fragment {
     private String FirstName, LastName, MobileNumber, UserID;
     DatabaseHelper databaseHelper;
     private List<User> contactmodel;
+    public static final String THIS_BROADCAST_FOR_CONTACT_SEARCHBAR = "this is for contact searchBar";
 
     private static final String TAG = "ContactsFragment";
     //private static final String TAG = "MyFirebaseMessagingServ";
@@ -181,6 +185,26 @@ public class ContactsFragment extends Fragment {
                     }
                 } );
     }
+    private BroadcastReceiver broadcastforsearchbar=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            List<User> data = ( List<User> ) intent.getSerializableExtra( "contactdata" );
+            Log.d(TAG, "message_sended: "+data);
+           mfetchAdapter.setCollection( data );
+        }
+    };
 
+    public void onResume() {
+        super.onResume();
+        //search
+        IntentFilter intentFilter1=new IntentFilter( THIS_BROADCAST_FOR_CONTACT_SEARCHBAR );
+        getActivity().registerReceiver( broadcastforsearchbar,intentFilter1 );
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver( broadcastforsearchbar);
+    }
 
 }

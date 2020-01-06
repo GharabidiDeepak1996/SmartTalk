@@ -1,15 +1,25 @@
 package com.example.smarttalk.modelclass;
 
+import android.util.Log;
+
 import java.io.Serializable;
 
 public class Message implements Serializable {
-    private String SenderID;
-    private String conversionID;
-    private String MessageID;
-    private String Body;
-    private String TimeStamp;
+    public String SenderID;
+    public String conversionID;
+    public String MessageID;
+    public String Body;
+    public String TimeStamp;
+    public  String DeliveryStatus;
 
 
+    public String getDeliveryStatus() {
+        return DeliveryStatus;
+    }
+
+    public void setDeliveryStatus(String deliveryStatus) {
+        DeliveryStatus = deliveryStatus;
+    }
 
     public String getBody() {
         return Body;

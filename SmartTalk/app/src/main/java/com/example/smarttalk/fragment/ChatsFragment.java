@@ -42,7 +42,7 @@ public class ChatsFragment extends Fragment {
 
     ChatAdapter mChatAdapter;
 
-    public static final String THIS_BROADCAST_FOR_SEARCHBAR = "this is for searchBar";
+    public static final String THIS_BROADCAST_FOR_CHAT_SEARCHBAR = "this is for searchBar";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate( R.layout.fragment_chats, container, false );
@@ -105,8 +105,8 @@ private BroadcastReceiver broadcastforsearchbar=new BroadcastReceiver() {
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        List<Chat> data = (List<Chat>) intent.getSerializableExtra("data");
 
-        List<Chat> data = ( List<Chat> ) intent.getSerializableExtra( "data" );
         mChatAdapter.setCollection( data );
         Log.d( TAG, "onReceive: "+data );
     }
@@ -115,7 +115,7 @@ private BroadcastReceiver broadcastforsearchbar=new BroadcastReceiver() {
     public void onResume() {
         super.onResume();
         //search
-        IntentFilter intentFilter1=new IntentFilter( THIS_BROADCAST_FOR_SEARCHBAR );
+        IntentFilter intentFilter1=new IntentFilter( THIS_BROADCAST_FOR_CHAT_SEARCHBAR );
         getActivity().registerReceiver( broadcastforsearchbar,intentFilter1 );
     }
 

@@ -3,15 +3,16 @@ package com.example.smarttalk;
 import java.security.SecureRandom;
 
 public class Utils {
-
-    public static String generateRandomString(int characterCount) {
-        final String ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_";
-        final SecureRandom RANDOM = new SecureRandom();
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < characterCount; ++i) {
-            sb.append( ALPHABET.charAt( RANDOM.nextInt( ALPHABET.length() ) ) );
+    private static final String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    public static String generateUniqueMessageId() {
+        int count = 16;
+        StringBuilder builder = new StringBuilder();
+        while (count-- != 0) {
+            int character = (int)(Math.random()*ALPHA_NUMERIC_STRING.length());
+            builder.append(ALPHA_NUMERIC_STRING.charAt(character));
         }
-        return sb.toString();
+        return builder.toString();
     }
+
+
 }

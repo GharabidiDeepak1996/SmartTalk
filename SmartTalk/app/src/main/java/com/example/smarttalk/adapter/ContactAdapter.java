@@ -95,6 +95,10 @@ public Context mcontext;
         contacts = contactList;
         notifyDataSetChanged();
     }
+    public void setCollection(List<User> chatCollection) {
+        contacts = chatCollection;
+        notifyDataSetChanged();
+    }
 
     class ViewHolder extends RecyclerView.ViewHolder {
            @BindViews({R.id.name,R.id.number } ) List<TextView> listTextView ;

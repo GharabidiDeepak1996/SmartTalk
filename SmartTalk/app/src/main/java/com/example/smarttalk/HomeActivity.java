@@ -1,11 +1,19 @@
 package com.example.smarttalk;
 
 import android.animation.Animator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -15,6 +23,7 @@ import com.example.smarttalk.adapter.TabLayoutAdapter;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
 import com.example.smarttalk.modelclass.User;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.nineoldandroids.animation.AnimatorSet;
@@ -38,9 +47,10 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
     MaterialSearchView materialSearchView;
      AppBarLayout appBar;
 
-    List<User> contactmodel;
 
     private static final String TAG = "HomeActivity";
+    private NetworkConnection receiver;
+    private boolean isConnected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +58,9 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
         setContentView( R.layout.home_activity );
         ButterKnife.bind( this );
 
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkConnection();
+        registerReceiver(receiver, filter);
         //setting the title
         toolbar.setTitle( "SmartTalk" );
         //placing toolbar in place of actionbar
@@ -75,7 +88,8 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
             @Override
             public boolean onQueryTextChange(String newText) {
 
-               databaseHelper.search( newText );
+               databaseHelper.Contactsearch( newText );
+               databaseHelper.Chatsearch(newText);
                 Log.d( TAG, "onQueryTextChange: "+newText );
 
                 return false;
@@ -146,6 +160,56 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onPageScrollStateChanged(int state) {
+
+    }
+    public class NetworkConnection extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+
+
+            isNetworkAvailable(context);
+
+        }
+
+
+        private boolean isNetworkAvailable(Context context) {
+            ConnectivityManager connectivity = (ConnectivityManager)
+                    context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivity != null) {
+                NetworkInfo[] info = connectivity.getAllNetworkInfo();
+                if (info != null) {
+                    for (int i = 0; i < info.length; i++) {
+                        if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+                            if(!isConnected){
+
+                                View parentLayout = findViewById(android.R.id.content);
+                                Snackbar snackbar = Snackbar.make(parentLayout, "Internet Connection is Active", Snackbar.LENGTH_SHORT);
+                                snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                                snackbar.show();
+
+                                isConnected = true;
+
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+            View parentLayout = findViewById(android.R.id.content);
+            Snackbar snackbar = Snackbar.make(parentLayout, "Internet Connection is Deactive", Snackbar.LENGTH_SHORT);
+            snackbar.getView().setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+            snackbar.show();
+            isConnected = false;
+            return false;
+        }
+    }
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+        unregisterReceiver(receiver);
 
     }
 }

@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat;
 import com.example.smarttalk.MessageActivity;
 import com.example.smarttalk.R;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
+import com.example.smarttalk.modelclass.Chat;
 import com.example.smarttalk.modelclass.Message;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -43,6 +44,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             message.setTimeStamp(jsonObject.getString( "TimeStamp" ) );
             md.insert( message );
 
+          /*  Chat chat = new Chat();
+            chat.unseencount = 0;
+            chat.message = message;
+            md.insertChats( chat );*/
         } catch (Exception e) {
 
         }
