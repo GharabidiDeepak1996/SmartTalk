@@ -55,31 +55,36 @@ public Context mcontext;
 
          // final User uploadCurrent = users.get( position );  //getter & Setter
           final  User mcontact=contacts.get( position );
-          holder.listTextView.get( 0 ).setText( mcontact.getFirstname().concat( mcontact.getLastname()) );
-          holder.listTextView.get( 1 ).setText( mcontact.getMobilenumber());
+          try {
+              holder.listTextView.get(0).setText(mcontact.getFirstname().concat(mcontact.getLastname()));
+              holder.listTextView.get(1).setText(mcontact.getMobilenumber());
 
-          //color generator
-          ColorGenerator generator=ColorGenerator.MATERIAL;    //color generator
-          String x=mcontact.getFirstname();
-          String[] myName = x.split(" ");
-          for (int i = 0; i < myName.length; i++) {
-               s = myName[i];
-          }
-          //https://github.com/amulyakhare/TextDrawable
-          TextDrawable drawable2 = TextDrawable.builder()
-                  .buildRound( String.valueOf( s.charAt( 0 ) ), generator.getRandomColor() );
-          holder.image.setImageDrawable( drawable2 );
-
-          holder.itemView.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View view) {
-                  Intent intent = new Intent( mcontext, MessageActivity.class );
-                  intent.putExtra( "ReceiverUserID", mcontact.getUserId() );
-                  intent.putExtra( "number",mcontact.getMobilenumber());
-                  intent.putExtra( "name", mcontact.getFirstname() + " " + mcontact.getLastname());
-                  mcontext.startActivity( intent );
+              //color generator
+              ColorGenerator generator = ColorGenerator.MATERIAL;    //color generator
+              String x = mcontact.getFirstname();
+              String[] myName = x.split(" ");
+              for (int i = 0; i < myName.length; i++) {
+                  s = myName[i];
               }
-          });
+
+              //https://github.com/amulyakhare/TextDrawable
+              TextDrawable drawable2 = TextDrawable.builder()
+                      .buildRound(String.valueOf(s.charAt(0)), generator.getRandomColor());
+              holder.image.setImageDrawable(drawable2);
+
+              holder.itemView.setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View view) {
+                      Intent intent = new Intent(mcontext, MessageActivity.class);
+                      intent.putExtra("ReceiverUserID", mcontact.getUserId());
+                      intent.putExtra("number", mcontact.getMobilenumber());
+                      intent.putExtra("name", mcontact.getFirstname() + " " + mcontact.getLastname());
+                      mcontext.startActivity(intent);
+                  }
+              });
+          }catch (Exception e){
+
+          }
            // holder.Tnumber.setText(users.get(position).getNumber() ); this is also one way
         }
     @Override

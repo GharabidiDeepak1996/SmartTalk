@@ -118,7 +118,7 @@ public static  final String Messa="messaage";
         Mobileno = intent.getStringExtra("number");
         Name = intent.getStringExtra("name");
         textView.setText(Name);
-        imageView.setImageResource(R.mipmap.ic_launcher);
+        imageView.setImageResource(R.mipmap.avatar);
 
         setupToolbar();
         try {
@@ -131,29 +131,15 @@ public static  final String Messa="messaage";
          preferences = getSharedPreferences(SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE);
         SenderID = preferences.getString(LOOGED_IN_USER_ID, "");
 
-        databaseHelper = new DatabaseHelper(this);
-        message1 = new ArrayList<>();
-        message1 = databaseHelper.getConversionID(ReceiverUserID);
-        messageAdapter = new MessageAdapter(MessageActivity.this, message1);
-        recyclerView.setAdapter(messageAdapter);
-
-
-
-
-       /* SharedPreferences preferences1 = getSharedPreferences(SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE);
-
-        String result = preferences1.getString(AppConstant.SharedPreferenceConstant.MESSAGE_DATABASE, null);
-        List<Message> list = new ArrayList<>();
-        Type listType = new TypeToken<List<Message>>() {}.getType();
-        list = gson.fromJson(result, listType);
-        Log.d(TAG, "isNetworkAvailable: "+list.size());
-*/
-
-      /*  List<Message> arrPackageData = gson.fromJson(result, (Type) Message.class);
-        assert arrPackageData != null;
-        for(Message data:arrPackageData) {
-            Log.d(TAG, "isNetworkAvailable: "+data.getMessageID());
-        }*/
+        try {
+            databaseHelper = new DatabaseHelper(this);
+            message1 = new ArrayList<>();
+            message1 = databaseHelper.getConversionID(ReceiverUserID);
+            messageAdapter = new MessageAdapter(MessageActivity.this, message1);
+            recyclerView.setAdapter(messageAdapter);
+        }catch (Exception ignored){
+            Log.d(TAG, "onCreate: "+ignored);
+        }
     }
 
     private void setupToolbar() {
@@ -306,8 +292,8 @@ public static  final String Messa="messaage";
                         if (info[i].getState() == NetworkInfo.State.CONNECTED) {
                             if (!isConnected) {
 
-                                if(preferences.contains(MESSAGE_DATABASE)){
-                                    String result = preferences.getString(AppConstant.SharedPreferenceConstant.MESSAGE_DATABASE, null);
+                                if(preferences.contains(PENDING_MESSAGE_SENDTO_DATABASE)){
+                                    String result = preferences.getString(AppConstant.SharedPreferenceConstant.PENDING_MESSAGE_SENDTO_DATABASE, null);
                                     Gson gson = new Gson();
                                     Message[] favoriteItems = gson.fromJson(result, Message[].class);
                                     message1 = Arrays.asList(favoriteItems);

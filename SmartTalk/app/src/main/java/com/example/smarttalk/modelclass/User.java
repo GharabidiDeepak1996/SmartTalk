@@ -8,11 +8,19 @@ public class User implements Serializable {
     private String firstname;
     private String lastname;
     private String mobilenumber;
-
-    private int id;
+    private String ProfileImageURI;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    }
+
+
+    public String getProfileImageURI() {
+        return ProfileImageURI;
+    }
+
+    public void setProfileImageURI(String profileImageURI) {
+        ProfileImageURI = profileImageURI;
     }
 
     public String getUserId() {

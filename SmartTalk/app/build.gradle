@@ -17,6 +17,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions{
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'META-INF/NOTICE'
+
+    }
     // Butterknife requires Java 8.
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -42,17 +48,19 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:20.1.0'
     implementation 'com.firebaseui:firebase-ui-auth:4.3.2'
     implementation 'com.google.firebase:firebase-auth:19.2.0'
+implementation 'com.google.firebase:firebase-storage:19.1.0'
+
     //material
     //implementation 'com.google.android.material:material:1.1.0-beta01'
     //or
     implementation 'com.android.support:design:29.0.0'
-     //butterknife
+    //butterknife
     implementation 'com.jakewharton:butterknife:10.2.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
 
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-   //textdrawable
+    //textdrawable
     implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     //circleimageview
     implementation 'de.hdodenhof:circleimageview:3.0.1'
@@ -64,9 +72,10 @@ dependencies {
 
 //searchview
     implementation 'com.miguelcatalan:materialsearchview:1.4.0'
-   //automatically handle clicks on the Home/Up button
+    //automatically handle clicks on the Home/Up button
     implementation 'com.nineoldandroids:library:2.4.0'
-
+//adding glid library
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
 
 }
 //firebase

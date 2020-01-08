@@ -21,6 +21,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.smarttalk.adapter.TabLayoutAdapter;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
+import com.example.smarttalk.fragment.ProfileFragment;
 import com.example.smarttalk.modelclass.User;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
@@ -70,7 +71,7 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
         List<String> list = new ArrayList<>();
         list.add( "Chats" );
         list.add( "Contacts" );
-
+        list.add("Profile");
         TabLayoutAdapter tabLayoutAdapter = new TabLayoutAdapter( getSupportFragmentManager(), list );
         viewPager.setAdapter( tabLayoutAdapter );
       //  viewPager.setCurrentItem( 1 );
@@ -97,6 +98,7 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
         } );
 
         viewPager.addOnPageChangeListener( this );
+
     }
 
     @Override

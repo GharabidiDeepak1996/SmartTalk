@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.example.smarttalk.fragment.ChatsFragment;
 import com.example.smarttalk.fragment.ContactsFragment;
+import com.example.smarttalk.fragment.ProfileFragment;
 
 import java.util.List;
 
@@ -32,6 +33,9 @@ public class TabLayoutAdapter extends FragmentStatePagerAdapter {
             case 1:
                 ContactsFragment contactsFragment=new ContactsFragment();
                 return contactsFragment;
+            case 2:
+                ProfileFragment profileFragment=new ProfileFragment();
+                return profileFragment;
                 default:
                     return null;
         }

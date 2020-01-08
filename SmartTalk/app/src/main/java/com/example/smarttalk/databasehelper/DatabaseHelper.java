@@ -435,7 +435,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 SharedPreferences.Editor editor = preferences.edit();
                 Gson gson = new Gson();
                 String jsonFavorites = gson.toJson(MessagePendingList);
-                editor.putString(AppConstant.SharedPreferenceConstant.MESSAGE_DATABASE,jsonFavorites);
+                editor.putString(AppConstant.SharedPreferenceConstant.PENDING_MESSAGE_SENDTO_DATABASE,jsonFavorites);
                 editor.apply();
             }
         }

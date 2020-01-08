@@ -9,6 +9,9 @@ public class AppConstant {
         public static final String LOOGED_IN_USER_ID = "logged_in_user_id";
         public static final String MESSAGE_PENDING="message pendding";
         public static final String MESSAGE_SUCCESSFULL_SENDED="message sucessfull sended";
-        public static final String MESSAGE_DATABASE="message update databse";
+        public static final String PENDING_MESSAGE_SENDTO_DATABASE="message update databse";
+    }
+    public class ImageURI{
+        public static final String ProfileImageUri="profile_image_uri";
     }
 }
