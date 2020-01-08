@@ -1,6 +1,5 @@
 package com.example.smarttalk.fragment;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,37 +15,37 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.smarttalk.AuthenticationActivity;
+import com.firebase.ui.auth.AuthUI;
 
 import com.bumptech.glide.Glide;
 import com.example.smarttalk.R;
 import com.example.smarttalk.constants.AppConstant;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 
+import butterknife.BindView;
 import de.hdodenhof.circleimageview.CircleImageView;
-import retrofit2.http.Url;
 
 import static android.app.Activity.RESULT_OK;
-import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements View.OnClickListener {
     private TextView TName, TNumber;
     CircleImageView Profileimage;
     Context mcontext;
@@ -54,8 +53,8 @@ public class ProfileFragment extends Fragment {
     private FirebaseAuth mAuth;
     private String userID;
     StorageReference filepath;
-
     Uri imageUri;
+    Button button;
     private static final String TAG = "ProfileFragment";
     //https://www.simplifiedcoding.net/firebase-storage-example/
 
@@ -67,7 +66,7 @@ public class ProfileFragment extends Fragment {
         Profileimage = view.findViewById(R.id.circularimage);
         mAuth = FirebaseAuth.getInstance();
         userID = mAuth.getCurrentUser().getUid();
-
+        button = view.findViewById(R.id.signout);
         //getUserInfo();
         mcontext = getActivity();
         SharedPreferences sharedPreferences = mcontext.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
@@ -84,9 +83,9 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        String url = sharedPreferences.getString(AppConstant.ImageURI.ProfileImageUri,null);
+        String url = sharedPreferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
         Glide.with(mcontext.getApplicationContext()).load(url).into(Profileimage);
-
+        button.setOnClickListener(this::onClick);
         return view;
     }
 
@@ -109,7 +108,7 @@ public class ProfileFragment extends Fragment {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(AppConstant.ImageURI.ProfileImageUri, url);
                     editor.apply();
-                    Log.d(TAG, "onSuccess: "+url);
+                    Log.d(TAG, "onSuccess: " + url);
 
                 }
             });
@@ -146,5 +145,18 @@ public class ProfileFragment extends Fragment {
                 }
             });
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        AuthUI.getInstance()
+                .signOut(mcontext)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(mcontext, "User Signed Out", Toast.LENGTH_SHORT).show();
+          Intent intent=new Intent(mcontext, AuthenticationActivity.class);
+          mcontext.startActivity(intent);
+                    }
+                });
     }
 }

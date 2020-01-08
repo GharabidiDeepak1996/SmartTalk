@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GetStartedActivity">
-
+    tools:context=".LauncherActivity">
 
     <ImageView
         android:layout_width="201dp"
@@ -16,14 +15,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-   <com.google.android.material.button.MaterialButton
-       android:id="@+id/getstarted"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       app:cornerRadius="22dp"
-       android:layout_margin="16dp"
-       android:text="@string/get_started"
-       app:layout_constraintStart_toStartOf="parent"
-       app:layout_constraintEnd_toEndOf="parent"
-       app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
