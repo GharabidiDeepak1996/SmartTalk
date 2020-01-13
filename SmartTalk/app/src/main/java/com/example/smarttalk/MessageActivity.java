@@ -119,7 +119,6 @@ public static  final String Messa="messaage";
         Name = intent.getStringExtra("name");
         textView.setText(Name);
         imageView.setImageResource(R.mipmap.avatar);
-
         setupToolbar();
         try {
             if (ReceiverUserID.contains("==")) {

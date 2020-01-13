@@ -157,10 +157,7 @@ public class ContactsFragment extends Fragment {
     }
 
     private void checkForCurrentLoggedInUser(final User user) {
-       /* if (user.getUserId().contains( "==" )) {
-            user.setUserId( user.getUserId().replace( "==", "" ) );
-            //senderID send to messageActivity
-        }*/
+
         Log.d( TAG, "checkForCurrentLoggedInUser: user Contanct Number : " + user.getUserId());
 
         //save the data login user in sharedpreference TO MESSAGE ACTIVITY

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,27 +47,26 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
-    private TextView TName, TNumber;
-    CircleImageView Profileimage;
-    Context mcontext;
+    private CircleImageView Profileimage;
+    private Context mcontext;
     private static final int PICK_IMAGE = 1;
-    private FirebaseAuth mAuth;
     private String userID;
-    StorageReference filepath;
-    Uri imageUri;
-    Button button;
+    private StorageReference filepath;
+    private Uri imageUri;
     private static final String TAG = "ProfileFragment";
     //https://www.simplifiedcoding.net/firebase-storage-example/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        TName = view.findViewById(R.id.Name);
-        TNumber = view.findViewById(R.id.Number);
+
+
+        TextView TName = view.findViewById(R.id.Name);
+        TextView TNumber = view.findViewById(R.id.Number);
         Profileimage = view.findViewById(R.id.circularimage);
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         userID = mAuth.getCurrentUser().getUid();
-        button = view.findViewById(R.id.signout);
+        Button button = view.findViewById(R.id.signout);
         //getUserInfo();
         mcontext = getActivity();
         SharedPreferences sharedPreferences = mcontext.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
@@ -84,7 +84,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
 
         String url = sharedPreferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
-        Glide.with(mcontext.getApplicationContext()).load(url).into(Profileimage);
+        if (url == null) {
+            Profileimage.setImageResource(R.mipmap.avatar);
+        } else {
+
+            Glide.with(mcontext.getApplicationContext()).load(url).into(Profileimage);
+        }
+
         button.setOnClickListener(this::onClick);
         return view;
     }
@@ -104,12 +110,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onSuccess(Uri uri) {
                     String url = uri.toString();
+                    Log.d(TAG, "onSuccessuri: " + uri);
                     SharedPreferences sharedPreferences = mcontext.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(AppConstant.ImageURI.ProfileImageUri, url);
                     editor.apply();
-                    Log.d(TAG, "onSuccess: " + url);
-
                 }
             });
 
@@ -128,6 +133,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            Toast.makeText(mcontext, "Image Sucessfull Uploaded", Toast.LENGTH_LONG).show();
             byte[] data1 = baos.toByteArray();
             UploadTask uploadTask = filepath.putBytes(data1);
 
@@ -154,8 +160,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
                         Toast.makeText(mcontext, "User Signed Out", Toast.LENGTH_SHORT).show();
-          Intent intent=new Intent(mcontext, AuthenticationActivity.class);
-          mcontext.startActivity(intent);
+                        Intent intent = new Intent(mcontext, AuthenticationActivity.class);
+                        mcontext.startActivity(intent);
                     }
                 });
     }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.appcompat.widget.Toolbar
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
+    app:layout_scrollFlags="scroll|enterAlways"
+    app:titleTextColor="#ffff"
+    android:id="@+id/toolbar"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+</androidx.appcompat.widget.Toolbar>
+
+    <!-- default size   android:layout_height="?attr/actionBarSize"-->
+
+    <!-- default color 8169473971  android:theme="@style/ThemeOverlay.AppCompat.Dark"-->

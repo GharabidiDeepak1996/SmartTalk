@@ -64,7 +64,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         if (message.getSenderID().equals(UserID)) {
             if (AppConstant.SharedPreferenceConstant.MESSAGE_PENDING.equalsIgnoreCase(message.getDeliveryStatus())) {
-                holder.imageView.setImageResource(R.drawable.ic_access_time_black_24dp);
+               holder.imageView.setImageResource(R.drawable.ic_access_time_black_24dp);
             } else {
                 holder.imageView.setImageResource(R.drawable.ic_done_black_24dp);
             }

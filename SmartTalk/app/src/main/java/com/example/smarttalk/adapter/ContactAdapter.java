@@ -55,7 +55,9 @@ public Context mcontext;
 
          // final User uploadCurrent = users.get( position );  //getter & Setter
           final  User mcontact=contacts.get( position );
-          try {
+          Log.d(TAG, "contactadaper: "+mcontact.getFirstname());
+
+
               holder.listTextView.get(0).setText(mcontact.getFirstname().concat(mcontact.getLastname()));
               holder.listTextView.get(1).setText(mcontact.getMobilenumber());
 
@@ -82,9 +84,7 @@ public Context mcontext;
                       mcontext.startActivity(intent);
                   }
               });
-          }catch (Exception e){
 
-          }
            // holder.Tnumber.setText(users.get(position).getNumber() ); this is also one way
         }
     @Override

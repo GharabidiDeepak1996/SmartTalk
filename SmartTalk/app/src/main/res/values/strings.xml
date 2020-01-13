@@ -16,8 +16,7 @@
     <string name="registration">registration</string>
     <string name="todo">TODO</string>
     <string name="signout">Signout</string>
-    <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
-    <string name="Phoneverify_application_id" translatable="false">YOUR_APP_ID</string>
-    <string name="Phoneverify_login_protocol_scheme" translatable="false">fbYOUR_APP_ID</string>
+    <string name="search">search</string>
+
 
 </resources>

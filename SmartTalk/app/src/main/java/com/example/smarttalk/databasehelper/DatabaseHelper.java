@@ -175,7 +175,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String last_name = cursor.getString(cursor.getColumnIndex(Contacts.LAST_NAME));
             String mobile_number = cursor.getString(cursor.getColumnIndex(Contacts.MOBILE_NUMBER));
 
-            Log.d(TAG, "display:First Name: " + first_name + ",Lastname: " + last_name + ",Mobilenumber :" + mobile_number);
+            Log.d(TAG, "displayData:First Name: " + first_name + ",Lastname: " + last_name + ",Mobilenumber :" + mobile_number);
             contact.setUserId(user_id);
             contact.setFirstname(first_name);
             contact.setLastname(last_name);
@@ -400,13 +400,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<User> list = new ArrayList<>();
 
         while (cursor.moveToNext()) {
-
-
             User mUser = new User();
             mUser.setFirstname(cursor.getString(cursor.getColumnIndex(Contacts.FIRST_NAME)));
             mUser.setLastname(cursor.getString(cursor.getColumnIndex(Contacts.LAST_NAME)));
             mUser.setUserId(cursor.getString(cursor.getColumnIndex(Contacts.USER_ID)));
-
+            mUser.setMobilenumber(cursor.getString(cursor.getColumnIndex(Contacts.MOBILE_NUMBER)));
             list.add(mUser);
         }
         Log.d(TAG, "listsize: " + list.size());

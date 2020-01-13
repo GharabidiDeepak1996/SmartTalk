@@ -10,19 +10,18 @@
     <LinearLayout
         android:id="@+id/linear"
         android:layout_width="match_parent"
-        android:layout_height="290dp"
+        android:layout_height="290px"
         android:background="#71e5"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/circularimage"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginStart="119dp"
-            android:layout_marginTop="68dp"
-            android:src="@mipmap/avatar"
-            app:civ_border_width="8dp" />
+            android:layout_width="150px"
+            android:layout_height="150px"
+            android:layout_marginStart="119px"
+            android:layout_marginTop="68px"
+            app:civ_border_width="8px" />
     </LinearLayout>
 
     <ImageView
@@ -76,4 +75,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Number"
         app:layout_constraintVertical_bias="0.372" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

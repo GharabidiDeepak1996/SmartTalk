@@ -59,7 +59,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="6dp"
                 android:layout_toLeftOf="@id/sender"
-                android:background="@drawable/text_corner"
+               android:background="@drawable/text_bar_corner"
                 android:hint="@string/type_a_message"
                 android:padding="10dp" />
 

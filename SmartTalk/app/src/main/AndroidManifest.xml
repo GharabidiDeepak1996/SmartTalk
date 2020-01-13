@@ -9,18 +9,15 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <supports-screens
-        android:anyDensity="true"
-
-        android:largeScreens="true"
-
-        android:normalScreens="true"
-
         android:resizeable="true"
-
         android:smallScreens="true"
-
-        android:xlargeScreens="true" />
-
+        android:normalScreens="true"
+        android:xlargeScreens="true"
+        android:largeScreens= "true"
+        android:compatibleWidthLimitDp="320"
+        android:requiresSmallestWidthDp="600"
+        android:anyDensity="true"
+        />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/smarttalk"

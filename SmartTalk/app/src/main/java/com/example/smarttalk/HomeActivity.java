@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -74,7 +75,7 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
         list.add("Profile");
         TabLayoutAdapter tabLayoutAdapter = new TabLayoutAdapter( getSupportFragmentManager(), list );
         viewPager.setAdapter( tabLayoutAdapter );
-      //  viewPager.setCurrentItem( 1 );
+
 //for search bar and tool bar combin
         appBar = findViewById(R.id.appBar);
         DatabaseHelper databaseHelper = new DatabaseHelper( this );
