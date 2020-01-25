@@ -16,9 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smarttalk.R;
+import com.example.smarttalk.activity.SchedulingMessageActivity;
+import com.example.smarttalk.activity.SmsSchedulerActivity;
 import com.example.smarttalk.adapter.ChatAdapter;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
 import com.example.smarttalk.modelclass.Chat;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +29,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.example.smarttalk.MessageActivity.THIS_BROADCAST;
+import static com.example.smarttalk.activity.MessageActivity.THIS_BROADCAST;
 
 
 public class ChatsFragment extends Fragment {
@@ -36,10 +39,6 @@ public class ChatsFragment extends Fragment {
     List<Chat> mchat;
     Boolean isExists;
     int indexToremove;
-    DatabaseHelper databaseHelper;
-    ChatAdapter chatAdapter;
-
-
     ChatAdapter mChatAdapter;
 
     public static final String THIS_BROADCAST_FOR_CHAT_SEARCHBAR = "this is for searchBar";
@@ -63,7 +62,16 @@ public class ChatsFragment extends Fragment {
         mchat = new ArrayList<>();
         mchat = databaseHelper.chatList();
         Log.d( TAG, "list: " + mchat );
-
+//floating button
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.floating_button);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Click action
+                Intent intent = new Intent(getActivity(), SmsSchedulerActivity.class);
+                startActivity(intent);
+            }
+        });
         mChatAdapter = new ChatAdapter( getActivity(), mchat );
         mrecyclerview.setAdapter( mChatAdapter );
         return view;

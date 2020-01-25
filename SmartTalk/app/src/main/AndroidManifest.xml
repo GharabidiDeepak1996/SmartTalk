@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.smarttalk">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -9,27 +10,29 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <supports-screens
+        android:anyDensity="true"
+        android:compatibleWidthLimitDp="320"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:requiresSmallestWidthDp="600"
         android:resizeable="true"
         android:smallScreens="true"
-        android:normalScreens="true"
-        android:xlargeScreens="true"
-        android:largeScreens= "true"
-        android:compatibleWidthLimitDp="320"
-        android:requiresSmallestWidthDp="600"
-        android:anyDensity="true"
-        />
+        android:xlargeScreens="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/smarttalk"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MessageActivity"></activity>
-        <activity android:name=".RegistrationActivity" />
-        <activity android:name=".AuthenticationActivity" />
-        <activity android:name=".GetStartedActivity" />
-        <activity android:name=".HomeActivity" />
-        <activity android:name=".LauncherActivity">
+        <activity android:name=".activity.SmsSchedulerActivity"></activity>
+        <activity android:name=".activity.SchedulingMessageActivity" />
+        <activity android:name=".activity.MessageActivity" />
+        <activity android:name=".activity.RegistrationActivity" />
+        <activity android:name=".activity.AuthenticationActivity" />
+        <activity android:name=".activity.GetStartedActivity" />
+        <activity android:name=".activity.HomeActivity" />
+        <activity android:name=".activity.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,6 +49,7 @@
             </intent-filter>
         </service>
 
+        <receiver android:name=".MyBroadcastReceiver" />
     </application>
 
 </manifest>

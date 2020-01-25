@@ -7,12 +7,11 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.smarttalk.MessageActivity;
+import com.example.smarttalk.activity.MessageActivity;
 import com.example.smarttalk.constants.AppConstant;
 import com.example.smarttalk.modelclass.Chat;
 import com.example.smarttalk.modelclass.Message;
@@ -26,7 +25,6 @@ import java.util.List;
 import static android.content.Context.MODE_PRIVATE;
 import static com.example.smarttalk.fragment.ChatsFragment.THIS_BROADCAST_FOR_CHAT_SEARCHBAR;
 import static com.example.smarttalk.fragment.ContactsFragment.THIS_BROADCAST_FOR_CONTACT_SEARCHBAR;
-import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "smarttalk.db";
@@ -443,6 +441,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public void namelast(String receiver_id){
+        SQLiteDatabase data = this.getReadableDatabase();
+        String query = "SELECT * FROM " + Messages.TABLE_NAME + " WHERE " + Messages.Delivery_Status_ALL + " = '" + "message pendding" + "';";
+        Cursor cursor = data.rawQuery(query, null);
+    }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {

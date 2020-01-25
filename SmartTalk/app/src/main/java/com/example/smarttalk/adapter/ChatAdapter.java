@@ -14,9 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.example.smarttalk.MessageActivity;
+import com.example.smarttalk.activity.MessageActivity;
 import com.example.smarttalk.R;
-import com.example.smarttalk.fragment.ChatsFragment;
 import com.example.smarttalk.modelclass.Chat;
 
 import java.util.List;

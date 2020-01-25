@@ -10,9 +10,11 @@ public class User implements Serializable {
     private String mobilenumber;
     private String ProfileImageURI;
 
-    public User() {
-        // Default constructor required for calls to DataSnapshot.getValue(User.class)
-    }
+
+
+public User(){
+
+}
 
 
     public String getProfileImageURI() {
@@ -55,5 +57,8 @@ public class User implements Serializable {
         this.mobilenumber = mobilenumber;
     }
 
-
+    @Override
+    public String toString() {
+        return this.firstname + " " + this.lastname;
+    }
 }
