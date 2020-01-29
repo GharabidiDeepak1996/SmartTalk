@@ -1,2 +1,2 @@
 # SmartTalk
-![grab-landing-page](https://ezgif.com/gif-to-mp4/ezgif-6-7c4c41740a7a.gif)
+![grab-landing-page](https://drive.google.com/file/d/1dDwHoWgs8Y22n7y7Vyt7tRwkCs0AIAR5/view)
