@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -14,20 +15,26 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
 import com.example.smarttalk.R;
 import com.example.smarttalk.adapter.TabLayoutAdapter;
+import com.example.smarttalk.constants.AppConstant;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
 import com.example.smarttalk.fragment.ProfileFragment;
 import com.example.smarttalk.modelclass.User;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -36,8 +43,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
-public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener  {
     //https://www.androidhive.info/2015/09/android-material-design-working-with-tabs/
 
     @BindView(R.id.toolbar)
@@ -48,7 +56,13 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
     ViewPager viewPager;
     @BindView(R.id.search_bar)
     MaterialSearchView materialSearchView;
-     AppBarLayout appBar;
+    @BindView(R.id.profile_image)
+    CircleImageView profile_image;
+    @BindView(R.id.title)
+    TextView title;
+    MenuItem menuItem;
+
+     //AppBarLayout appBar;
 
 
     private static final String TAG = "HomeActivity";
@@ -65,10 +79,21 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
         receiver = new NetworkConnection();
         registerReceiver(receiver, filter);
         //setting the title
-        toolbar.setTitle( "SmartTalk" );
+        title.setText("SmartTalk");
         //placing toolbar in place of actionbar
         setSupportActionBar( toolbar );
         tabLayout.setupWithViewPager( viewPager );
+        viewPager.addOnPageChangeListener(this);
+
+        SharedPreferences sharedPreferences = this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        String url = sharedPreferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
+
+
+            Glide.with(this)
+                    .load(url)
+                    .placeholder(R.mipmap.avatar)
+                    .into(profile_image);
+
 
         List<String> list = new ArrayList<>();
         list.add( "Chats" );
@@ -77,8 +102,7 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
         TabLayoutAdapter tabLayoutAdapter = new TabLayoutAdapter( getSupportFragmentManager(), list );
         viewPager.setAdapter( tabLayoutAdapter );
 
-//for search bar and tool bar combin
-        appBar = findViewById(R.id.appBar);
+
         DatabaseHelper databaseHelper = new DatabaseHelper( this );
         //this is for searchview
 
@@ -98,56 +122,15 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
                 return false;
             }
         } );
-
-        viewPager.addOnPageChangeListener( this );
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d( TAG, "onCreateOptionsMenu: " + menu );
         getMenuInflater().inflate( R.menu.menu_item, menu );
-        MenuItem menuItem = menu.findItem( R.id.action_search );
+         menuItem = menu.findItem( R.id.action_search );
         materialSearchView.setMenuItem( menuItem );
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button
-
-
-        AnimatorSet set = new AnimatorSet();
-        set.playTogether(
-                ObjectAnimator.ofFloat(appBar, "translationY", -tabLayout.getHeight()),
-                ObjectAnimator.ofFloat(viewPager, "translationY", -tabLayout.getHeight()),
-                ObjectAnimator.ofFloat(appBar, "alpha", 0)
-        );
-        set.setDuration(100).addListener(new com.nineoldandroids.animation.Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(com.nineoldandroids.animation.Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(com.nineoldandroids.animation.Animator animation) {
-                appBar.setVisibility( View.GONE);
-            }
-
-            @Override
-            public void onAnimationCancel(com.nineoldandroids.animation.Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(com.nineoldandroids.animation.Animator animation) {
-
-            }
-        });
-        set.start();
-        return super.onOptionsItemSelected(item);
-
     }
 
     @Override
@@ -157,15 +140,24 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onPageSelected(int position) {
-        if (materialSearchView.isSearchOpen()) {
-            materialSearchView.closeSearch();
-        }
+        Log.d(TAG, "onPageSelected: "+position);
+if(position==2){
+   // menuItem.setVisible(false);
+    getSupportActionBar().hide();
+}else {
+  //  menuItem.setVisible(true);
+getSupportActionBar().show();
+}
+
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
 
+
     }
+
+
     public class NetworkConnection extends BroadcastReceiver {
 
         @Override
@@ -216,5 +208,6 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
         unregisterReceiver(receiver);
 
     }
+
 }
 

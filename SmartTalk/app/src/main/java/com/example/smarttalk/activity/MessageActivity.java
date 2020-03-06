@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.smarttalk.R;
 import com.example.smarttalk.Utils;
 import com.example.smarttalk.adapter.MessageAdapter;
@@ -67,7 +68,7 @@ public class MessageActivity extends AppCompatActivity {
     @BindView(R.id.Image)
     ImageView imageView;
 
-    String ReceiverUserID, SenderID, Mobileno, Name, MessageID, timeStamp;
+    String ReceiverUserID, SenderID, Mobileno, Name, MessageID, timeStamp,profileImage;
     MessageAdapter messageAdapter;
     Context mcontext;
     List<Message> message1;
@@ -118,8 +119,15 @@ public static  final String Messa="messaage";
         Log.d(TAG, "ReceiverUserID: "+ReceiverUserID);
         Mobileno = intent.getStringExtra("number");
         Name = intent.getStringExtra("name");
+        profileImage=intent.getStringExtra("imageView");
+
         textView.setText(Name);
-        imageView.setImageResource(R.mipmap.avatar);
+
+        Glide.with(this)
+                .load(profileImage)
+                .placeholder(R.mipmap.avatar)
+                .into(imageView);
+
         setupToolbar();
         try {
             if (ReceiverUserID.contains("==")) {

@@ -36,6 +36,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -53,7 +54,7 @@ public class ContactsFragment extends Fragment {
     private String mLoggedInUserContactNumber;
     private Context mContext;
     private SharedPreferences mPreference;
-    private String FirstName, LastName, MobileNumber, UserID;
+    private String FirstName, LastName, MobileNumber, UserID,imageView;
     DatabaseHelper databaseHelper;
     private List<User> contactmodel;
     public static final String THIS_BROADCAST_FOR_CONTACT_SEARCHBAR = "this is for contact searchBar";
@@ -98,21 +99,20 @@ public class ContactsFragment extends Fragment {
         Log.d( TAG, "contactmodel: "+contactmodel );
         mfetchAdapter = new ContactAdapter( getActivity(), contactmodel );
         recyclerView.setAdapter( mfetchAdapter );
-
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+
         DatabaseReference databaseReference = firebaseDatabase.getReference( "User" );
 
         databaseReference.addValueEventListener( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d( TAG, "onDataChange 1: " + dataSnapshot );
+            //    Log.d( TAG, "onDataChange 1: " + dataSnapshot );
                 //iterating through all the values in database
                 List<User> contactList = new ArrayList<>(  );
 
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     //all the user id will access here in userID
                     String userId = postSnapshot.getKey();
-
                     User user = postSnapshot.getValue( User.class );
                     if (user != null ) {
                         user.setUserId( userId );
@@ -123,19 +123,21 @@ public class ContactsFragment extends Fragment {
 
                     if (mLoggedInUserContactNumber != null && !mLoggedInUserContactNumber.equalsIgnoreCase( user.getMobilenumber() )) {
 
-                        Log.d( TAG, "UserID55: "+user.getUserId());
                         UserID = user.getUserId();
                         FirstName = user.getFirstname();
                         LastName = user.getLastname();
                         MobileNumber = user.getMobilenumber();
-                        Log.d( TAG, "onDataChange: 0+"+MobileNumber );
+                        imageView=user.getProfileImageURI();
+
                         //Offline data will save in databas
                         User contact = new User();
                         contact.setUserId( UserID );
                         contact.setFirstname( FirstName );
                         contact.setLastname( LastName );
                         contact.setMobilenumber( MobileNumber );
-                        Log.d( TAG, "UserID: "+UserID );
+                        contact.setProfileImageURI(imageView);
+
+                        Log.d( TAG, "UserID: "+user.getProfileImageURI() );
                         databaseHelper.insert( contact );
                         contactList.add( contact );
                     } else {
@@ -153,6 +155,7 @@ public class ContactsFragment extends Fragment {
                 Log.w( TAG, "Failed to read value.", error.toException() );
             }
         } );
+
         return view;
     }
 

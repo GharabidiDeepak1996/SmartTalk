@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Schedule.CreateSchedule">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:targetApi="lollipop"
+        android:background="@color/colorPrimary"
+        app:titleTextColor="#ffff" />
+
+    <AutoCompleteTextView
+        android:id="@+id/autocomplete_country"
+        android:layout_width="353dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="@string/to"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <TextView
+        android:id="@+id/btnsetDate"
+        android:layout_width="99dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="36dp"
+        android:gravity="center_vertical"
+        android:text="Select Date"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/autocomplete_country" />
+
+    <TextView
+        android:id="@+id/textViewDate"
+        android:layout_width="153dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="36dp"
+        android:layout_weight="7"
+        android:gravity="center"
+        android:text=""
+        android:textColor="#565656"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/btnsetDate"
+        app:layout_constraintTop_toBottomOf="@id/autocomplete_country" />
+
+
+    <Button
+        android:id="@+id/Bdate"
+        android:layout_width="0dp"
+        android:layout_height="37dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="28dp"
+        android:text="date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/textViewDate"
+        app:layout_constraintTop_toBottomOf="@id/autocomplete_country" />
+
+    <Button
+        android:id="@+id/Btime"
+        android:layout_width="0dp"
+        android:layout_height="37dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="28dp"
+        android:text="time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/textViewTime"
+        app:layout_constraintTop_toBottomOf="@id/Bdate" />
+
+    <TextView
+        android:id="@+id/btnsetTime"
+        android:layout_width="99dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="2"
+        android:gravity="center_vertical"
+        android:text="Select Time"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnsetDate" />
+
+    <TextView
+        android:id="@+id/textViewTime"
+        android:layout_width="153dp"
+        android:layout_height="34dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="7"
+        android:gravity="center"
+        android:text=""
+        android:textColor="#565656"
+        android:textSize="20dp"
+        app:layout_constraintStart_toEndOf="@id/btnsetTime"
+        app:layout_constraintTop_toBottomOf="@id/textViewDate" />
+
+    <EditText
+        android:id="@+id/editTextMessage"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/white"
+        android:gravity="top"
+        android:hint="Message..."
+        android:lines="4"
+        android:maxLength="170"
+        android:paddingLeft="20dp"
+        android:paddingTop="1dp"
+        android:text=""
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewTime" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:onClick="scheduledmessage"
+        android:text="Set Schedule Message"
+        app:cornerRadius="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextMessage"
+        app:layout_constraintVertical_bias="0.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

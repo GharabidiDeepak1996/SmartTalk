@@ -71,8 +71,9 @@ public class AuthenticationActivity extends AppCompatActivity {
                 }
             }
         };
-        database=FirebaseDatabase.getInstance();
+       database=FirebaseDatabase.getInstance();
         database.setPersistenceEnabled( true );
+
     }
 
     public void database() {
@@ -80,7 +81,7 @@ public class AuthenticationActivity extends AppCompatActivity {
         Log.d( TAG, "database: " + user );
         //Base64
         final byte[] encoded = Base64.encode(user.getBytes(), Base64.DEFAULT );
-         database=FirebaseDatabase.getInstance();
+         FirebaseDatabase.getInstance();
         DatabaseReference myRef=database.getReference("User");
      //   DatabaseReference myRef=FirebaseDatabase.getInstance().getReference("User");
         //unique ID will get.
@@ -122,6 +123,7 @@ public class AuthenticationActivity extends AppCompatActivity {
             }
         } );
         Log.d( TAG, "database: " + user );
+        finish();
     }
     @Override
     protected void onResume() {

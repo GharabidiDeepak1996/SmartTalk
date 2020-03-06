@@ -99,7 +99,8 @@ String UserID;
         String Lastname = new String(clname);
         modelclass.setLastname( Lastname);
         modelclass.setMobilenumber( mobilenumber );
-
+        modelclass.setProfileImageURI("Default");
+        modelclass.setStatus("Default");
     }
 
 
@@ -111,7 +112,8 @@ String UserID;
 
         //base64 code will be child
         String Base64_ID = getIntent().getStringExtra( "Base64_ID" );
-        myRef.child( Base64_ID ).setValue( modelclass );
+        assert Base64_ID != null;
+        myRef.child( Base64_ID ).setValue( modelclass);
         Toast.makeText( RegistrationActivity.this, "Data is inserted Succesfull", Toast.LENGTH_LONG ).show();
         //Save Contact Number into Shared Preference
         //https://stackoverflow.com/questions/3624280/how-to-use-sharedpreferences-in-android-to-store-fetch-and-edit-values

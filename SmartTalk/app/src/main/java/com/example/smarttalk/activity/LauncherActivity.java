@@ -16,7 +16,6 @@ import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConsta
 public class LauncherActivity extends AppCompatActivity {
 
     private static final String TAG = "LauncherActivity";
-   // public static final String PREFERENCE_NAME = "mydata";
    public static final String IS_ALREADY_LOGIN = "is_already_login";
 
     @Override
@@ -37,7 +36,7 @@ public class LauncherActivity extends AppCompatActivity {
 
             Intent intent=new Intent( this, GetStartedActivity.class );
             startActivity( intent );
-        }
 
+        }
     }
 }

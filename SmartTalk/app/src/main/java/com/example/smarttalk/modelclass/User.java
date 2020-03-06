@@ -9,13 +9,20 @@ public class User implements Serializable {
     private String lastname;
     private String mobilenumber;
     private String ProfileImageURI;
-
+    private String Status;
 
 
 public User(){
 
 }
 
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
+    }
 
     public String getProfileImageURI() {
         return ProfileImageURI;

@@ -25,8 +25,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SmsSchedulerActivity"></activity>
-        <activity android:name=".activity.SchedulingMessageActivity" />
+        <activity android:name=".Schedule.MessageSchedule"></activity>
+        <activity android:name=".Schedule.CreateSchedule" />
         <activity android:name=".activity.MessageActivity" />
         <activity android:name=".activity.RegistrationActivity" />
         <activity android:name=".activity.AuthenticationActivity" />
@@ -49,7 +49,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".MyBroadcastReceiver" />
+        <receiver android:name=".Schedule.MyBroadcastReceiver" />
     </application>
 
 </manifest>

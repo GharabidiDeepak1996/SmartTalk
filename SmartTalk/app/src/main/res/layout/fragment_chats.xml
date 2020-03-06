@@ -18,6 +18,6 @@
       android:layout_height="wrap_content"
       android:layout_margin="@dimen/fab_margin"
       android:layout_gravity="bottom|end"
-      android:src="@android:drawable/ic_dialog_email" />
+      android:src="@drawable/baseline_schedule_white_18dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

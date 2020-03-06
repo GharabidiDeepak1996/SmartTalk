@@ -16,8 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smarttalk.R;
-import com.example.smarttalk.activity.SchedulingMessageActivity;
-import com.example.smarttalk.activity.SmsSchedulerActivity;
+import com.example.smarttalk.Schedule.MessageSchedule;
 import com.example.smarttalk.adapter.ChatAdapter;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
 import com.example.smarttalk.modelclass.Chat;
@@ -52,7 +51,6 @@ public class ChatsFragment extends Fragment {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager( getActivity() );
         mrecyclerview.setLayoutManager( linearLayoutManager );
-        mrecyclerview.setHasFixedSize( true );
         //line divider bewt the cardview
         DividerItemDecoration itemDecor = new DividerItemDecoration( getActivity(), linearLayoutManager.getOrientation() );
         mrecyclerview.addItemDecoration( itemDecor );
@@ -68,7 +66,7 @@ public class ChatsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 // Click action
-                Intent intent = new Intent(getActivity(), SmsSchedulerActivity.class);
+                Intent intent = new Intent(getActivity(), MessageSchedule.class);
                 startActivity(intent);
             }
         });

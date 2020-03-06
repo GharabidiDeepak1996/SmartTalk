@@ -1,7 +1,6 @@
 package com.example.smarttalk.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.example.smarttalk.R;
-import com.example.smarttalk.activity.SchedulingMessageActivity;
 import com.example.smarttalk.modelclass.User;
 
 import java.util.ArrayList;

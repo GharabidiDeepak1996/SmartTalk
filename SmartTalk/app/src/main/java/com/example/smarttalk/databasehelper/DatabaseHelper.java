@@ -152,7 +152,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(Contacts.MOBILE_NUMBER, contact.getMobilenumber());
         // long row = database.insertWithOnConflict( Contacts.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE );
         long row = database.insertWithOnConflict(Contacts.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
-
         Log.d(TAG, "Inside insertStudent() -> Row : " + row);
     }
 

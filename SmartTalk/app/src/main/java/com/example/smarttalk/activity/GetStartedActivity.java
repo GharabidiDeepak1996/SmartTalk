@@ -37,6 +37,7 @@ public class GetStartedActivity extends AppCompatActivity {
 
                 Intent intent=new Intent( GetStartedActivity.this, AuthenticationActivity.class );
                 startActivity( intent );
+                finish();
             }
         } );
     }

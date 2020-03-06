@@ -5,12 +5,13 @@ import android.util.Log;
 import java.io.Serializable;
 
 public class Message implements Serializable {
-    public String SenderID;
-    public String conversionID;
+    private String SenderID;
+    private String conversionID;
     public String MessageID;
-    public String Body;
-    public String TimeStamp;
-    public  String DeliveryStatus;
+    private String Body;
+    private String TimeStamp;
+    private  String DeliveryStatus;
+
 
 
     public String getDeliveryStatus() {
