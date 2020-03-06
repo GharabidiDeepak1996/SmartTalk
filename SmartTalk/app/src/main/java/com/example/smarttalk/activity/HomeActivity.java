@@ -45,6 +45,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.example.smarttalk.fragment.ProfileFragment.THIS_BROADCAST_FOR_PROFILE_IMAGE;
+
 public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener  {
     //https://www.androidhive.info/2015/09/android-material-design-working-with-tabs/
 
@@ -62,9 +64,6 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
     TextView title;
     MenuItem menuItem;
 
-     //AppBarLayout appBar;
-
-
     private static final String TAG = "HomeActivity";
     private NetworkConnection receiver;
     private boolean isConnected = false;
@@ -78,22 +77,15 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         receiver = new NetworkConnection();
         registerReceiver(receiver, filter);
+
+        IntentFilter intentFilter1=new IntentFilter( THIS_BROADCAST_FOR_PROFILE_IMAGE );
+       registerReceiver( broadcastReceiverForprofileImage,intentFilter1 );
         //setting the title
         title.setText("SmartTalk");
         //placing toolbar in place of actionbar
         setSupportActionBar( toolbar );
         tabLayout.setupWithViewPager( viewPager );
         viewPager.addOnPageChangeListener(this);
-
-        SharedPreferences sharedPreferences = this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        String url = sharedPreferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
-
-
-            Glide.with(this)
-                    .load(url)
-                    .placeholder(R.mipmap.avatar)
-                    .into(profile_image);
-
 
         List<String> list = new ArrayList<>();
         list.add( "Chats" );
@@ -123,6 +115,18 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
             }
         } );
     }
+    BroadcastReceiver broadcastReceiverForprofileImage=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+         String url=intent.getStringExtra("profileImage");
+
+            Glide.with(context)
+                    .load(url)
+                    .placeholder(R.mipmap.avatar)
+                    .into(profile_image);
+        }
+    };
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -204,7 +208,7 @@ getSupportActionBar().show();
     protected void onDestroy() {
 
         super.onDestroy();
-
+        unregisterReceiver( broadcastReceiverForprofileImage );
         unregisterReceiver(receiver);
 
     }

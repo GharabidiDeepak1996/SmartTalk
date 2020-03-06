@@ -1,13 +1,16 @@
 package com.example.smarttalk.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -58,9 +61,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private String userID;
     private StorageReference filepath;
     FirebaseAuth mAuth;
-    FirebaseUser firebaseUser;
     private Uri imageUri;
     private static final String TAG = "ProfileFragment";
+    public static final String THIS_BROADCAST_FOR_PROFILE_IMAGE = "this is for profile image";
+
     //https://www.simplifiedcoding.net/firebase-storage-example/
 
     @Override
@@ -93,24 +97,26 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 startActivityForResult(gallery, PICK_IMAGE);
             }
         });
-//fetch image url
         String url = sharedPreferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
-        if (url == null) {
-            Profileimage.setImageResource(R.mipmap.avatar);
-        } else {
 
-            Glide.with(mcontext.getApplicationContext()).load(url).into(Profileimage);
-        }
-
+        //Send the broadcast to homeActivity
+        Intent intent=new Intent(THIS_BROADCAST_FOR_PROFILE_IMAGE);
+        intent.putExtra("profileImage",url);
+        mcontext.sendBroadcast(intent);
+//fetch image url
+        Glide.with(mcontext)
+                .load(url)
+                .placeholder(R.mipmap.avatar)
+                .into(Profileimage);
         button.setOnClickListener(this);
         return view;
     }
 
-    //Result
+    //THIS METHOD FOR RECEIVE THE IMAGES OF PICKED FROM THE GALLERY
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Log.d(TAG, "onActivityResult: "+data);
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null && data.getData()!=null) {
             imageUri = data.getData();
             Profileimage.setImageURI(imageUri);
@@ -121,13 +127,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onSuccess(Uri uri) {
                     String url = uri.toString();
-                    Log.d(TAG, "onSuccessuri: " + uri);
+
                     //put image url into SharedPreference
                     SharedPreferences sharedPreferences = mcontext.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(AppConstant.ImageURI.ProfileImageUri, url);
                     editor.apply();
-                    //insert
+                    //insert in to sharedperf
                     String base64id=sharedPreferences.getString(LOOGED_IN_USER_ID,null);
                     FirebaseDatabase database= FirebaseDatabase.getInstance();
                     DatabaseReference myRef =database.getReference("User").child(base64id.concat("=="));
@@ -176,6 +182,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+
     @Override
     public void onClick(View v) {
         AuthUI.getInstance()
@@ -188,4 +195,5 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     }
                 });
     }
+
 }
