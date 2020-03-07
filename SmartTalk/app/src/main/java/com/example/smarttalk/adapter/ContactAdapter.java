@@ -4,8 +4,15 @@ package com.example.smarttalk.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +44,7 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_CONTACT_NUMBER;
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
     private static final String TAG = "ContactAdapter";
@@ -79,16 +87,17 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
            for (String value : myName) {
                s = value;
 
-
            //https://github.com/amulyakhare/TextDrawable
            TextDrawable drawable2 = TextDrawable.builder()
-                   .buildRound(String.valueOf(s.charAt(0)), generator.getRandomColor());
+                  .buildRound(String.valueOf(s.charAt(0)), generator.getRandomColor());
+
+               Drawable d = new BitmapDrawable(drawableToBitmap(drawable2));
 
                Glide.with(mcontext)
                        .load(mcontact.getProfileImageURI())
-                       .placeholder(drawable2)
+                      .placeholder(d)
                        .into(holder.image);
-       }
+           }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,13 +109,33 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 mcontext.startActivity(intent);
             }
         });
+
            if(mcontact.getStatus()!=null && mcontact.getStatus().equals("online")) {
                holder.status.setImageResource(R.color.online);
            }else{
                holder.status.setImageResource(R.color.offline);
            }
-    }
 
+    }
+    //converter is required for circleimageview does not support the textdrawable to drawable
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+
+        int width = drawable.getIntrinsicWidth();
+        width = width > 0 ? width : 96; // Replaced the 1 by a 96
+        int height = drawable.getIntrinsicHeight();
+        height = height > 0 ? height : 96; // Replaced the 1 by a 96
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
     @Override
     public int getItemCount() {
 
@@ -130,7 +159,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         @BindViews({R.id.name, R.id.number})
         List<TextView> listTextView;
         @BindView(R.id.image_view)
-        ImageView image;
+        CircleImageView image;
         @BindView(R.id.statusChecker)
         CircleImageView status;
 

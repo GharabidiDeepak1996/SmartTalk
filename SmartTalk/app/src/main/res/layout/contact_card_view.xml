@@ -3,7 +3,7 @@
 <androidx.cardview.widget.CardView xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contactcard"
     android:layout_width="match_parent"
-    android:layout_height="76dp"
+    android:layout_height="86dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="8dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -12,11 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="86dp">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/image_view"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_margin="18dp"
+            app:civ_border_width="2dp"
             tools:srcCompat="@tools:sample/avatars"/>
 
         <TextView
