@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.cardview.widget.CardView
+<androidx.cardview.widget.CardView xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contactcard"
     android:layout_width="match_parent"
     android:layout_height="76dp"
@@ -16,7 +16,8 @@
             android:id="@+id/image_view"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:layout_margin="18dp" />
+            android:layout_margin="18dp"
+            tools:srcCompat="@tools:sample/avatars"/>
 
         <TextView
             android:id="@+id/name"
@@ -25,7 +26,8 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
             android:layout_toEndOf="@id/image_view"
-            android:textSize="16dp" />
+            android:textSize="16dp"
+            android:text="jbds jsgf gsd kkjgjsdffsnkfks k.dbfkja"/>
 
         <TextView
             android:id="@+id/number"
@@ -34,7 +36,16 @@
             android:layout_below="@id/name"
             android:layout_marginLeft="24dp"
             android:layout_toRightOf="@id/image_view"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:text="ksjfd gdfighsd "/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/statusChecker"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="55dp"
+            android:layout_marginStart="60dp" />
+
     </RelativeLayout>
 
     </androidx.cardview.widget.CardView>

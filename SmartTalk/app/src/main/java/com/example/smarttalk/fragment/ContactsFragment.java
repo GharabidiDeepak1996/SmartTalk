@@ -54,9 +54,11 @@ public class ContactsFragment extends Fragment {
     private String mLoggedInUserContactNumber;
     private Context mContext;
     private SharedPreferences mPreference;
-    private String FirstName, LastName, MobileNumber, UserID,imageView;
-    DatabaseHelper databaseHelper;
+    private String FirstName, LastName, MobileNumber, UserID,imageView,status;
+    private DatabaseHelper databaseHelper;
     private List<User> contactmodel;
+    private User contact;
+
     public static final String THIS_BROADCAST_FOR_CONTACT_SEARCHBAR = "this is for contact searchBar";
 
     private static final String TAG = "ContactsFragment";
@@ -121,6 +123,7 @@ public class ContactsFragment extends Fragment {
                         user.setUserId( user.getUserId().replace( "==", "" ) );
                     }
 
+
                     if (mLoggedInUserContactNumber != null && !mLoggedInUserContactNumber.equalsIgnoreCase( user.getMobilenumber() )) {
 
                         UserID = user.getUserId();
@@ -128,16 +131,18 @@ public class ContactsFragment extends Fragment {
                         LastName = user.getLastname();
                         MobileNumber = user.getMobilenumber();
                         imageView=user.getProfileImageURI();
+                        status=user.getStatus();
 
                         //Offline data will save in databas
-                        User contact = new User();
+
+                         contact = new User();
                         contact.setUserId( UserID );
                         contact.setFirstname( FirstName );
                         contact.setLastname( LastName );
                         contact.setMobilenumber( MobileNumber );
                         contact.setProfileImageURI(imageView);
+                        contact.setStatus(status);
 
-                        Log.d( TAG, "UserID: "+user.getProfileImageURI() );
                         databaseHelper.insert( contact );
                         contactList.add( contact );
                     } else {

@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="sender_chat_bubble_colot"> #6edd93</color>
+    <color name="online">#47D476</color>
+    <color name="offline">#FF0000</color>
+
 </resources>

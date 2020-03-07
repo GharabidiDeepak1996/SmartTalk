@@ -4,6 +4,8 @@ package com.example.smarttalk.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +34,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_CONTACT_NUMBER;
 
@@ -63,7 +66,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
         // final User uploadCurrent = users.get( position );  //getter & Setter
         final User mcontact = contacts.get(position);
-        Log.d(TAG, "contactadaper: " + mcontact.getProfileImageURI());
+        Log.d(TAG, "contactadaper: " + mcontact.getStatus());
 
 
         holder.listTextView.get(0).setText(mcontact.getFirstname().concat(mcontact.getLastname()));
@@ -85,8 +88,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                        .load(mcontact.getProfileImageURI())
                        .placeholder(drawable2)
                        .into(holder.image);
-
-           //holder.image.setImageDrawable(drawable2);
        }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,8 +100,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 mcontext.startActivity(intent);
             }
         });
-
-        // holder.Tnumber.setText(users.get(position).getNumber() ); this is also one way
+           if(mcontact.getStatus()!=null && mcontact.getStatus().equals("online")) {
+               holder.status.setImageResource(R.color.online);
+           }else{
+               holder.status.setImageResource(R.color.offline);
+           }
     }
 
     @Override
@@ -127,6 +131,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         List<TextView> listTextView;
         @BindView(R.id.image_view)
         ImageView image;
+        @BindView(R.id.statusChecker)
+        CircleImageView status;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);

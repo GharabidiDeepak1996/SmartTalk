@@ -33,18 +33,22 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant.LOOGED_IN_USER_ID;
 import static com.example.smarttalk.fragment.ProfileFragment.THIS_BROADCAST_FOR_PROFILE_IMAGE;
 
 public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener  {
@@ -79,13 +83,21 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
         registerReceiver(receiver, filter);
 
         IntentFilter intentFilter1=new IntentFilter( THIS_BROADCAST_FOR_PROFILE_IMAGE );
-       registerReceiver( broadcastReceiverForprofileImage,intentFilter1 );
+        registerReceiver( broadcastReceiverForprofileImage,intentFilter1 );
+
         //setting the title
         title.setText("SmartTalk");
         //placing toolbar in place of actionbar
         setSupportActionBar( toolbar );
         tabLayout.setupWithViewPager( viewPager );
         viewPager.addOnPageChangeListener(this);
+
+        SharedPreferences sharedPreferences = this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        String url = sharedPreferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
+        Glide.with(this)
+                .load(url)
+                .placeholder(R.mipmap.avatar)
+                .into(profile_image);
 
         List<String> list = new ArrayList<>();
         list.add( "Chats" );
@@ -210,8 +222,27 @@ getSupportActionBar().show();
         super.onDestroy();
         unregisterReceiver( broadcastReceiverForprofileImage );
         unregisterReceiver(receiver);
-
     }
+public void status(String status){
+    SharedPreferences sharedPreferences =this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+    String base64id=sharedPreferences.getString(LOOGED_IN_USER_ID,null);
+    FirebaseDatabase database= FirebaseDatabase.getInstance();
+    DatabaseReference myRef =database.getReference("User").child(base64id.concat("=="));
 
+    HashMap<String,Object> hashMap=new HashMap<>();
+    hashMap.put("status",status);
+    myRef.updateChildren(hashMap);
+}
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+       status("online");
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+      status("offline");
+    }
 }
 
