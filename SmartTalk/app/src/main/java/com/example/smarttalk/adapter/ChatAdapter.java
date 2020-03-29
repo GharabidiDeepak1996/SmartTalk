@@ -2,11 +2,12 @@ package com.example.smarttalk.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.bumptech.glide.Glide;
 import com.example.smarttalk.activity.MessageActivity;
 import com.example.smarttalk.R;
 import com.example.smarttalk.modelclass.Chat;
@@ -22,6 +24,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
+
+import static com.example.smarttalk.adapter.ContactAdapter.drawableToBitmap;
 
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
@@ -53,6 +58,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
         holder.Body.setText( chat.message.getBody() );
         holder.Timestamp.setText( chat.message.getTimeStamp() );
 
+
         //color generator
         ColorGenerator generator=ColorGenerator.MATERIAL;    //color generator
         String x=chat.user.getFirstname();
@@ -63,8 +69,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
         //https://github.com/amulyakhare/TextDrawable
         TextDrawable drawable2 = TextDrawable.builder()
                 .buildRound( String.valueOf( s.charAt( 0 ) ), generator.getRandomColor() );
-        holder.drawimage.setImageDrawable( drawable2 );
-
+        //this converter textDrawable to drawable
+        Drawable d = new BitmapDrawable(drawableToBitmap(drawable2));
+        Glide.with(mcontext)
+                .load(chat.user.getProfileImageURI())
+                .placeholder(d)
+                .into(holder.profileImage);
+        Log.d(TAG, "onBindViewHolder: "+chat.user.getStatus());
+        if(chat.user.getStatus()!=null && chat.user.getStatus().equals("online")) {
+            holder.status.setImageResource(R.color.online);
+        }else{
+            holder.status.setImageResource(R.color.offline);
+        }
         holder.itemView.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,6 +88,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
                 intent.putExtra( "ReceiverUserID", chat.user.getUserId() );
                 intent.putExtra( "number",chat.user.getMobilenumber());
                 intent.putExtra( "name", chat.user.getFirstname() + " " + chat.user.getLastname());
+                intent.putExtra("imageView",chat.user.getProfileImageURI());
                 mcontext.startActivity( intent );
             }
         } );
@@ -86,6 +103,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
         mchat.add( 0, chat );
         notifyDataSetChanged();
     }
+
 
     public void setCollection(List<Chat> chatCollection) {
         mchat = chatCollection;
@@ -102,7 +120,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
         @BindView( R.id.name_textview )TextView Name;
         @BindView( R.id.body_textview)TextView Body;
         @BindView( R.id.timestamp_textview )TextView Timestamp;
-        @BindView( R.id.image ) ImageView drawimage;
+        @BindView( R.id.image ) CircleImageView profileImage;
+        @BindView( R.id.statusChecker ) CircleImageView status;
         public viewHolder(@NonNull View itemView) {
             super( itemView );
      ButterKnife.bind( this,itemView );

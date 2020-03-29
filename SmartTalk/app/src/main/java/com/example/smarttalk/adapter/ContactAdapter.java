@@ -43,6 +43,7 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.example.smarttalk.activity.MessageActivity.STATUS_CHECKER;
 import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_CONTACT_NUMBER;
 import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
@@ -73,16 +74,16 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
 
         // final User uploadCurrent = users.get( position );  //getter & Setter
-        final User mcontact = contacts.get(position);
-        Log.d(TAG, "contactadaper: " + mcontact.getStatus());
+        final User muser = contacts.get(position);
+        Log.d(TAG, "contactadaper: " + muser.getStatus());
 
 
-        holder.listTextView.get(0).setText(mcontact.getFirstname().concat(mcontact.getLastname()));
-        holder.listTextView.get(1).setText(mcontact.getMobilenumber());
+        holder.listTextView.get(0).setText(muser.getFirstname().concat(muser.getLastname()));
+        holder.listTextView.get(1).setText(muser.getMobilenumber());
 
            //color generator
            ColorGenerator generator = ColorGenerator.MATERIAL;    //color generator
-           String x = mcontact.getFirstname();
+           String x = muser.getFirstname();
            String[] myName = x.split(" ");
            for (String value : myName) {
                s = value;
@@ -92,9 +93,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                   .buildRound(String.valueOf(s.charAt(0)), generator.getRandomColor());
 
                Drawable d = new BitmapDrawable(drawableToBitmap(drawable2));
-
+//image holder
                Glide.with(mcontext)
-                       .load(mcontact.getProfileImageURI())
+                       .load(muser.getProfileImageURI())
                       .placeholder(d)
                        .into(holder.image);
            }
@@ -102,15 +103,18 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mcontext, MessageActivity.class);
-                intent.putExtra("ReceiverUserID", mcontact.getUserId());
-                intent.putExtra("number", mcontact.getMobilenumber());
-                intent.putExtra("name", mcontact.getFirstname() + " " + mcontact.getLastname());
-                intent.putExtra("imageView",mcontact.getProfileImageURI());
+                intent.putExtra("ReceiverUserID", muser.getUserId());
+                intent.putExtra("number", muser.getMobilenumber());
+                intent.putExtra("name", muser.getFirstname() + " " + muser.getLastname());
+                intent.putExtra("imageView",muser.getProfileImageURI());
                 mcontext.startActivity(intent);
+
+
             }
         });
 
-           if(mcontact.getStatus()!=null && mcontact.getStatus().equals("online")) {
+
+           if(muser.getStatus()!=null && muser.getStatus().equals("online")) {
                holder.status.setImageResource(R.color.online);
            }else{
                holder.status.setImageResource(R.color.offline);

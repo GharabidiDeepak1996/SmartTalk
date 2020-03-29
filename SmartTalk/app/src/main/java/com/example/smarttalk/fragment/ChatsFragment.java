@@ -56,10 +56,13 @@ public class ChatsFragment extends Fragment {
         mrecyclerview.addItemDecoration( itemDecor );
 
         // context=container.getContext();
-        DatabaseHelper databaseHelper = new DatabaseHelper( container.getContext() );
+        DatabaseHelper databaseHelper= new DatabaseHelper( container.getContext() );
         mchat = new ArrayList<>();
         mchat = databaseHelper.chatList();
-        Log.d( TAG, "list: " + mchat );
+        mChatAdapter = new ChatAdapter( getActivity(), mchat );
+        mrecyclerview.setAdapter( mChatAdapter );
+
+
 //floating button
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.floating_button);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -70,11 +73,10 @@ public class ChatsFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        mChatAdapter = new ChatAdapter( getActivity(), mchat );
-        mrecyclerview.setAdapter( mChatAdapter );
         return view;
     }
 
+    //coming form message Activity
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -114,7 +116,7 @@ private BroadcastReceiver broadcastforsearchbar=new BroadcastReceiver() {
         List<Chat> data = (List<Chat>) intent.getSerializableExtra("data");
 
         mChatAdapter.setCollection( data );
-        Log.d( TAG, "onReceive: "+data );
+
     }
 };
     @Override
@@ -135,5 +137,6 @@ private BroadcastReceiver broadcastforsearchbar=new BroadcastReceiver() {
     public void onDestroyView() {
         super.onDestroyView();
         getActivity().unregisterReceiver( broadcastReceiver );
+
     }
 }

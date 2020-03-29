@@ -1,6 +1,7 @@
 package com.example.smarttalk.activity;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -72,6 +73,7 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
     private NetworkConnection receiver;
     private boolean isConnected = false;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
@@ -186,8 +188,7 @@ getSupportActionBar().show();
 
 
         private boolean isNetworkAvailable(Context context) {
-            ConnectivityManager connectivity = (ConnectivityManager)
-                    context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (connectivity != null) {
                 NetworkInfo[] info = connectivity.getAllNetworkInfo();
                 if (info != null) {
@@ -227,7 +228,10 @@ public void status(String status){
     SharedPreferences sharedPreferences =this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
     String base64id=sharedPreferences.getString(LOOGED_IN_USER_ID,null);
     FirebaseDatabase database= FirebaseDatabase.getInstance();
+    assert base64id != null;
     DatabaseReference myRef =database.getReference("User").child(base64id.concat("=="));
+
+    Log.d(TAG, "status: "+status + myRef);
 
     HashMap<String,Object> hashMap=new HashMap<>();
     hashMap.put("status",status);
@@ -239,6 +243,7 @@ public void status(String status){
         super.onResume();
        status("online");
     }
+
     @Override
     protected void onPause() {
         super.onPause();

@@ -28,18 +28,22 @@ import com.example.smarttalk.Utils;
 import com.example.smarttalk.adapter.MessageAdapter;
 import com.example.smarttalk.constants.AppConstant;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
+import com.example.smarttalk.modelclass.User;
 import com.example.smarttalk.retrofit.BaseApplication;
 import com.example.smarttalk.retrofit.Data;
 import com.example.smarttalk.retrofit.FCMAPI;
 import com.example.smarttalk.retrofit.MessageEntity;
 import com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant;
 import com.example.smarttalk.modelclass.Message;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,22 +67,24 @@ public class MessageActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     @BindView(R.id.Emessage)
     EditText text_send;
-    @BindView(R.id.text)
-    TextView textView;
+    @BindView(R.id.profile_name)
+    TextView profileName;
+    @BindView(R.id.status)
+    TextView textViewStatus;
     @BindView(R.id.Image)
     ImageView imageView;
 
-    String ReceiverUserID, SenderID, Mobileno, Name, MessageID, timeStamp,profileImage;
+   public String ReceiverUserID, SenderID, Mobileno, Name, MessageID, timeStamp,profileImage;
     MessageAdapter messageAdapter;
     Context mcontext;
     List<Message> message1;
     SharedPreferences preferences;
-
+    User muser;
     DatabaseHelper databaseHelper;
     public static final String THIS_BROADCAST = "this is my broadcast";
     public static final String UPDATE_MESSAGE_STATUS_BRODCAST = "update message status broadcast";
     public static final String MESSAGEID_STATUS_UPDATE = "messageID status update";
-public static  final String Messa="messaage";
+    public static final String STATUS_CHECKER="status checker";
     //AutoUpdate Internet Status.
     private NetworkChangeReceiver receiver;
     private boolean isConnected = false;
@@ -106,6 +112,10 @@ public static  final String Messa="messaage";
         receiver = new NetworkChangeReceiver();
         registerReceiver(receiver, filter);
 
+        //STATUS CHECKER
+        IntentFilter intentFilterstatusChecker = new IntentFilter(STATUS_CHECKER);
+        registerReceiver(statusChecker, intentFilterstatusChecker);
+
         //messageRecyclerview
         recyclerView.setHasFixedSize(true);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -120,14 +130,13 @@ public static  final String Messa="messaage";
         Mobileno = intent.getStringExtra("number");
         Name = intent.getStringExtra("name");
         profileImage=intent.getStringExtra("imageView");
-
-        textView.setText(Name);
+        Log.d(TAG, "onCreate: "+profileImage);
+        profileName.setText(Name);
 
         Glide.with(this)
                 .load(profileImage)
                 .placeholder(R.mipmap.avatar)
                 .into(imageView);
-
         setupToolbar();
         try {
             if (ReceiverUserID.contains("==")) {
@@ -246,8 +255,6 @@ public static  final String Messa="messaage";
                 DatabaseHelper updatedatabasehander = new DatabaseHelper(context);
                 Message message = updatedatabasehander.getMessageById(messageId);
                 messageAdapter.updateMessageToAdapter(message);
-
-
             }
         }
     };
@@ -323,11 +330,49 @@ public static  final String Messa="messaage";
             isConnected = false;
         }
     }
+    BroadcastReceiver statusChecker=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String number=intent.getStringExtra("number");
+            assert number != null;
+            if(number.equals(Mobileno)){
+              String status=  intent.getStringExtra("statuscheck");
+                textViewStatus.setText(status);
+
+            }
+
+        }
+    };
+    public void status(String status){
+        SharedPreferences sharedPreferences =this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        String base64id=sharedPreferences.getString(LOOGED_IN_USER_ID,null);
+        FirebaseDatabase database= FirebaseDatabase.getInstance();
+        assert base64id != null;
+        DatabaseReference myRef =database.getReference("User").child(base64id.concat("=="));
+
+        Log.d(TAG, "status: "+status + myRef);
+
+        HashMap<String,Object> hashMap=new HashMap<>();
+        hashMap.put("status",status);
+        myRef.updateChildren(hashMap);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        status("offline");
+    }
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
         unregisterReceiver(UpdateBroadcastReceiver);
         unregisterReceiver(receiver);
+        unregisterReceiver(statusChecker);
     }
 
 }

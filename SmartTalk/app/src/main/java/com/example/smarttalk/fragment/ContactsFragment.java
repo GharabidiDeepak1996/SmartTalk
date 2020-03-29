@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.smarttalk.activity.MessageActivity;
 import com.example.smarttalk.adapter.ContactAdapter;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
 import com.example.smarttalk.modelclass.User;
@@ -43,6 +44,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.example.smarttalk.activity.MessageActivity.STATUS_CHECKER;
 
 
 public class ContactsFragment extends Fragment {
@@ -60,7 +62,6 @@ public class ContactsFragment extends Fragment {
     private User contact;
 
     public static final String THIS_BROADCAST_FOR_CONTACT_SEARCHBAR = "this is for contact searchBar";
-
     private static final String TAG = "ContactsFragment";
     //private static final String TAG = "MyFirebaseMessagingServ";
 
@@ -144,7 +145,14 @@ public class ContactsFragment extends Fragment {
                         contact.setStatus(status);
 
                         databaseHelper.insert( contact );
+                        databaseHelper.updatetheprofileImageandstatus(imageView,status,MobileNumber);
                         contactList.add( contact );
+
+                        Intent status=new Intent(STATUS_CHECKER);
+                        status.putExtra("statuscheck",user.getStatus());
+                        status.putExtra("number",user.getMobilenumber());
+                        mContext.sendBroadcast(status);
+
                     } else {
 
                         checkForCurrentLoggedInUser( user );
@@ -175,7 +183,7 @@ public class ContactsFragment extends Fragment {
         Log.d( TAG, "userID: " + user.getUserId() );
         edit.apply();
 
-//subscribe FCM sender topic should be subscribe because of receiver the message from receiver side.
+        Log.d(TAG, "checkForCurrentLoggedInUser: "+user.getUserId());
         FirebaseMessaging.getInstance().subscribeToTopic( user.getUserId() )
                 .addOnCompleteListener( new OnCompleteListener<Void>() {
                     @Override

@@ -1,5 +1,6 @@
 package com.example.smarttalk.databasehelper;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.example.smarttalk.activity.MessageActivity;
 import com.example.smarttalk.constants.AppConstant;
+import com.example.smarttalk.fragment.ChatsFragment;
 import com.example.smarttalk.modelclass.Chat;
 import com.example.smarttalk.modelclass.Message;
 import com.example.smarttalk.modelclass.User;
@@ -44,6 +46,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public static final String FIRST_NAME = "user_name";
         public static final String LAST_NAME = "user_sur_name";
         public static final String MOBILE_NUMBER = "user_mobile";
+        public static final String PROFILE_IMAGE = "profile_imagetext";
+        public static final String status = "statustext";
     }
 
     public class Messages {
@@ -73,7 +77,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Contacts.USER_ID + " text UNIQUE, " +
                 Contacts.FIRST_NAME + " text , " +
                 Contacts.LAST_NAME + " text , " +
-                Contacts.MOBILE_NUMBER + " text UNIQUE " +
+                Contacts.MOBILE_NUMBER + " text UNIQUE, " +
+                Contacts.PROFILE_IMAGE + " text , " +
+                Contacts.status + " text  " +
                 ");";
         sqLiteDatabase.execSQL(Contactsquery);
 
@@ -150,11 +156,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(Contacts.FIRST_NAME, contact.getFirstname());
         contentValues.put(Contacts.LAST_NAME, contact.getLastname());
         contentValues.put(Contacts.MOBILE_NUMBER, contact.getMobilenumber());
+        contentValues.put(Contacts.PROFILE_IMAGE, contact.getProfileImageURI());
+        contentValues.put(Contacts.status,contact.getStatus());
+        Log.d(TAG, "insertima: "+contact.getProfileImageURI());
         // long row = database.insertWithOnConflict( Contacts.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE );
         long row = database.insertWithOnConflict(Contacts.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
         Log.d(TAG, "Inside insertStudent() -> Row : " + row);
     }
-
+    public void updatetheprofileImageandstatus(String profileImages, String status,String number) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        Log.d(TAG, "updatetheprofileImageandstatus: ");
+        values.put(Contacts.PROFILE_IMAGE, profileImages);
+        values.put(Contacts.status, status);
+        ChatsFragment chat=new ChatsFragment();
+        db.update(Contacts.TABLE_NAME, values,"user_mobile = ?",new String[]{number});
+    }
     public List<User> display() {
         List<User> ContactList = new ArrayList<>();
         String query = "SELECT * FROM " + Contacts.TABLE_NAME;
@@ -256,7 +273,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return MessageList;
     }
 
-    public void insertChats(Chat chat) {
+    private void insertChats(Chat chat) {
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(Chats.conversionID, chat.message.getConversionID());
@@ -265,8 +282,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // long row = database.insertWithOnConflict( Chats.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE );
     }
 
+    //this required for a adapter List.
     public List<Chat> chatList() {
-
         SQLiteDatabase database = this.getReadableDatabase();
         String query = "SELECT * FROM " + Chats.TABLE_NAME +
                 " JOIN " + Contacts.TABLE_NAME +
@@ -299,14 +316,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             mUser.setFirstname(cursor.getString(cursor.getColumnIndex(Contacts.FIRST_NAME)));
             mUser.setLastname(cursor.getString(cursor.getColumnIndex(Contacts.LAST_NAME)));
             mUser.setUserId(cursor.getString(cursor.getColumnIndex(Contacts.USER_ID)));
+            mUser.setProfileImageURI(cursor.getString(cursor.getColumnIndex(Contacts.PROFILE_IMAGE)));
+            mUser.setStatus(cursor.getString(cursor.getColumnIndex(Contacts.status)));
             chat.user = mUser;
             chatList.add(chat);
         }
         cursor.close();
+
         return chatList;
 
     }
 
+     //fetching data through by converstion ID
     public Chat getChatByConversationId(String conversionID) {
         Log.d(TAG, "getChatByConversationId: " + conversionID);
 
@@ -338,6 +359,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         mUser.setFirstname(cursor.getString(cursor.getColumnIndex(Contacts.FIRST_NAME)));
         mUser.setLastname(cursor.getString(cursor.getColumnIndex(Contacts.LAST_NAME)));
         mUser.setUserId(cursor.getString(cursor.getColumnIndex(Contacts.USER_ID)));
+        mUser.setProfileImageURI(cursor.getString(cursor.getColumnIndex(Contacts.PROFILE_IMAGE)));
+        mUser.setStatus(cursor.getString(cursor.getColumnIndex(Contacts.status)));
         chat.user = mUser;
         cursor.close();
         return chat;
