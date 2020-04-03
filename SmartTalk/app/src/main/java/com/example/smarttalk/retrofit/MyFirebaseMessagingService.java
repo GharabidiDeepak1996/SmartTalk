@@ -56,16 +56,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         //notification channelid set on contactfragment.KzkxODkyODgxNDkxMg
         Log.d(TAG, "onMessageReceived56: "+sernderID);
         Intent intent = new Intent(getApplicationContext(), MessageActivity.class);
-        Bundle bundle=new Bundle();
-        bundle.putString("hisUID",sernderID);
-        intent.putExtras(bundle);
-       intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("hisUID",sernderID);
+      // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  PendingIntent.FLAG_ONE_SHOT
 
         PendingIntent pendingIntent=PendingIntent.getActivity(
                 this,
                 0,
                 intent,
-              PendingIntent.FLAG_ONE_SHOT );
+                PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,"mynotification")
                 .setContentTitle(Title)
                 .setContentText(MessaageBody)
