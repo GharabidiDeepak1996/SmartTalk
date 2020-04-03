@@ -210,7 +210,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getReadableDatabase();
         String query = "SELECT * FROM " + Messages.TABLE_NAME + " WHERE " + Messages.MessageID + " = '" + messageId + "' ;";
         Cursor cursor = database.rawQuery(query, null);
-        Log.d(TAG, "Cursor Count : " + cursor.getCount());
+      //  Log.d(TAG, "Cursor Count : " + cursor.getCount());
         Message message = new Message();
 
         while (cursor.moveToNext()) {

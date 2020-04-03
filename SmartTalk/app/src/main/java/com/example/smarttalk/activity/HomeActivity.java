@@ -36,12 +36,16 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -93,7 +97,7 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
         setSupportActionBar( toolbar );
         tabLayout.setupWithViewPager( viewPager );
         viewPager.addOnPageChangeListener(this);
-
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         SharedPreferences sharedPreferences = this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         String url = sharedPreferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
         Glide.with(this)
@@ -227,15 +231,15 @@ getSupportActionBar().show();
 public void status(String status){
     SharedPreferences sharedPreferences =this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
     String base64id=sharedPreferences.getString(LOOGED_IN_USER_ID,null);
-    FirebaseDatabase database= FirebaseDatabase.getInstance();
-    assert base64id != null;
-    DatabaseReference myRef =database.getReference("User").child(base64id.concat("=="));
-
-    Log.d(TAG, "status: "+status + myRef);
-
-    HashMap<String,Object> hashMap=new HashMap<>();
-    hashMap.put("status",status);
-    myRef.updateChildren(hashMap);
+ if(base64id==null){
+     Log.d(TAG, "status: ");
+ }else {
+     FirebaseDatabase database = FirebaseDatabase.getInstance();
+     DatabaseReference myRef = database.getReference("User").child(base64id.concat("=="));
+     HashMap<String, Object> hashMap = new HashMap<>();
+     hashMap.put("status", status);
+     myRef.updateChildren(hashMap);
+ }
 }
 
     @Override
@@ -247,7 +251,9 @@ public void status(String status){
     @Override
     protected void onPause() {
         super.onPause();
-      status("offline");
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+        String  timeStamp1 = sdf.format(new Date());
+        status("Last Seen :"+timeStamp1);
     }
 }
 

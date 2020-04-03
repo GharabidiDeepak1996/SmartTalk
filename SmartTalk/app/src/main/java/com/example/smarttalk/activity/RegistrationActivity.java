@@ -101,6 +101,7 @@ String UserID;
         modelclass.setMobilenumber( mobilenumber );
         modelclass.setProfileImageURI("Default");
         modelclass.setStatus("Default");
+        modelclass.setIsTyping("Default");
     }
 
 

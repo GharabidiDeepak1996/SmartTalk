@@ -10,11 +10,19 @@ public class User implements Serializable {
     private String mobilenumber;
     private String ProfileImageURI;
     private String Status;
-
+    private String isTyping;
 
 public User(){
 
 }
+
+    public String getIsTyping() {
+        return isTyping;
+    }
+
+    public void setIsTyping(String isTyping) {
+        this.isTyping = isTyping;
+    }
 
     public String getStatus() {
         return Status;

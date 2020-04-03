@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name"></string>
+    <string name="SmartTalk">SmartTalk</string>
     <string name="get_started">GET STARTED</string>
     <string name="enter_your_number">Enter Your Number</string>
     <string name="next">NEXT</string>

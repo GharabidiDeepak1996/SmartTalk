@@ -30,6 +30,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
     private static final int MSG_TYPE_LEFT = 0;
     private static final int MSG_TYPE_RIGHT = 1;
+    private static final int SET_DATE=2;
     private static final String TAG = "MessageAdapter";
 
     private Context mContext;
@@ -43,6 +44,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.d(TAG, "onCreateViewHolder: "+MSG_TYPE_RIGHT);
         if (viewType == MSG_TYPE_RIGHT) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.message_on_rightside, parent, false);
 
@@ -69,7 +71,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 holder.imageView.setImageResource(R.drawable.ic_done_black_24dp);
             }
         }
-
+        Log.d(TAG, "onBindViewHolder1996: "+position);
     }
 
     public void updateMessageToAdapter(Message messageData) {
@@ -94,10 +96,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     @Override
     public int getItemViewType(int position) {
+        Log.d(TAG, "getItemViewType: "+position);
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE);
         String SenderID = sharedPreferences.getString(AppConstant.SharedPreferenceConstant.LOOGED_IN_USER_ID, "");
-        Log.d(TAG, "getItemViewType 1: " + mChat.get(position).getSenderID());
-        Log.d(TAG, "getItemViewType 2: " + SenderID);
+        /*Log.d(TAG, "getItemViewType 1: " + mChat.get(position).getSenderID());
+        Log.d(TAG, "getItemViewType 2: " + SenderID);*/
         if (mChat.get(position).getSenderID().equals(SenderID)) {
             return MSG_TYPE_RIGHT;
         } else {

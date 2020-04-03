@@ -36,6 +36,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,7 @@ public class ContactsFragment extends Fragment {
     private String mLoggedInUserContactNumber;
     private Context mContext;
     private SharedPreferences mPreference;
-    private String FirstName, LastName, MobileNumber, UserID,imageView,status;
+    private String FirstName, LastName, MobileNumber, UserID,imageView,status,typing;
     private DatabaseHelper databaseHelper;
     private List<User> contactmodel;
     private User contact;
@@ -124,6 +125,11 @@ public class ContactsFragment extends Fragment {
                         user.setUserId( user.getUserId().replace( "==", "" ) );
                     }
 
+                    Intent status1=new Intent(STATUS_CHECKER);
+                    status1.putExtra("statuscheck",user.getStatus());
+                    status1.putExtra("number",user.getMobilenumber());
+                    status1.putExtra("isTyping",user.getIsTyping());
+                    mContext.sendBroadcast(status1);
 
                     if (mLoggedInUserContactNumber != null && !mLoggedInUserContactNumber.equalsIgnoreCase( user.getMobilenumber() )) {
 
@@ -133,6 +139,8 @@ public class ContactsFragment extends Fragment {
                         MobileNumber = user.getMobilenumber();
                         imageView=user.getProfileImageURI();
                         status=user.getStatus();
+                        typing=user.getIsTyping();
+
 
                         //Offline data will save in databas
 
@@ -143,15 +151,11 @@ public class ContactsFragment extends Fragment {
                         contact.setMobilenumber( MobileNumber );
                         contact.setProfileImageURI(imageView);
                         contact.setStatus(status);
+                        contact.setIsTyping(typing);
 
                         databaseHelper.insert( contact );
                         databaseHelper.updatetheprofileImageandstatus(imageView,status,MobileNumber);
                         contactList.add( contact );
-
-                        Intent status=new Intent(STATUS_CHECKER);
-                        status.putExtra("statuscheck",user.getStatus());
-                        status.putExtra("number",user.getMobilenumber());
-                        mContext.sendBroadcast(status);
 
                     } else {
 

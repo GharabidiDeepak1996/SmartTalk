@@ -14,6 +14,8 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,6 +37,7 @@ import com.example.smarttalk.retrofit.FCMAPI;
 import com.example.smarttalk.retrofit.MessageEntity;
 import com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant;
 import com.example.smarttalk.modelclass.Message;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
@@ -42,10 +45,13 @@ import com.google.gson.Gson;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,22 +79,27 @@ public class MessageActivity extends AppCompatActivity {
     TextView textViewStatus;
     @BindView(R.id.Image)
     ImageView imageView;
-
-   public String ReceiverUserID, SenderID, Mobileno, Name, MessageID, timeStamp,profileImage;
+    @BindView(R.id.floating_button)
+    FloatingActionButton floatingActionButton;
+    String firstFourChars = "";
+   public String ReceiverUserID, SenderID, Mobileno, Name, MessageID, timeStamp,profileImage,status,typing,number;
     MessageAdapter messageAdapter;
     Context mcontext;
     List<Message> message1;
     SharedPreferences preferences;
-    User muser;
     DatabaseHelper databaseHelper;
     public static final String THIS_BROADCAST = "this is my broadcast";
     public static final String UPDATE_MESSAGE_STATUS_BRODCAST = "update message status broadcast";
     public static final String MESSAGEID_STATUS_UPDATE = "messageID status update";
     public static final String STATUS_CHECKER="status checker";
+    public static final String IS_TYPING="typing";
     //AutoUpdate Internet Status.
     private NetworkChangeReceiver receiver;
     private boolean isConnected = false;
-
+    public boolean isTyping = false;
+   private Timer timer = new Timer();
+   private final long DELAY = 3000; // milliseconds
+    List<User> data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +117,6 @@ public class MessageActivity extends AppCompatActivity {
         IntentFilter intentFilter2 = new IntentFilter(MESSAGEID_STATUS_UPDATE);
         receiver = new NetworkChangeReceiver();
         registerReceiver(receiver, intentFilter2);
-
         //INTERNET AUTO DETETCTED
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         receiver = new NetworkChangeReceiver();
@@ -122,11 +132,15 @@ public class MessageActivity extends AppCompatActivity {
         linearLayoutManager.setStackFromEnd(true);
         linearLayoutManager.setReverseLayout(false);
         recyclerView.setLayoutManager(linearLayoutManager);
-
         //receiving from myrecycleradapter.
         Intent intent = getIntent();
         ReceiverUserID = intent.getStringExtra("ReceiverUserID");
-        Log.d(TAG, "ReceiverUserID: "+ReceiverUserID);
+        if(ReceiverUserID!=null){
+            ReceiverUserID = intent.getStringExtra("ReceiverUserID");
+        }else {
+            ReceiverUserID= intent.getStringExtra("hisUID");
+        }
+        Log.d(TAG, "onCreate562: "+ReceiverUserID+"  2."+ReceiverUserID);
         Mobileno = intent.getStringExtra("number");
         Name = intent.getStringExtra("name");
         profileImage=intent.getStringExtra("imageView");
@@ -149,15 +163,90 @@ public class MessageActivity extends AppCompatActivity {
         SenderID = preferences.getString(LOOGED_IN_USER_ID, "");
 
         try {
+
+            Log.d(TAG, "onCreate456: "+ReceiverUserID);
             databaseHelper = new DatabaseHelper(this);
             message1 = new ArrayList<>();
             message1 = databaseHelper.getConversionID(ReceiverUserID);
             messageAdapter = new MessageAdapter(MessageActivity.this, message1);
             recyclerView.setAdapter(messageAdapter);
+//smooth scrolling from bottom when new message insert
+            Log.d(TAG, "onCreate132: "+messageAdapter.getItemCount()+"  "+(messageAdapter.getItemCount()-1));
+            messageAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+                @Override
+                public void onItemRangeInserted(int positionStart, int itemCount) {
+                    super.onItemRangeInserted(positionStart, itemCount);
+                    linearLayoutManager.smoothScrollToPosition(recyclerView,null,messageAdapter.getItemCount()-1);
+
+                }
+            });
         }catch (Exception ignored){
             Log.d(TAG, "onCreate: "+ignored);
         }
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dx==0 && dy==0){
+                   floatingActionButton.hide();
+                }else if(dy<0 ){
+                    floatingActionButton.show();
+                }else if(dy > 0){
+                    floatingActionButton.hide();
+                }
+
+             floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                 @Override
+                 public void onClick(View v) {
+                     Log.d(TAG, "onClick: "+message1.size() + "hjfaj" +(message1.size() -1));
+                   //  recyclerView.smoothScrollToPosition(0); //scroll to top
+                     linearLayoutManager.scrollToPosition(message1.size() -1); //sroll to down
+                 }
+             });
+
+            }
+        });
+        text_send.addTextChangedListener(watcher);
     }
+
+TextWatcher watcher=new TextWatcher() {
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+    @Override
+    public void afterTextChanged(Editable s) {
+        if (s.toString().trim().length() == 0) {
+            checkTypingStatus("noOne");
+        } else {
+            SharedPreferences sharedPreferences = getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+            String number = sharedPreferences.getString(LOGGED_IN_USER_CONTACT_NUMBER, null);
+            checkTypingStatus(number+" "+s);
+        }
+
+        if(!isTyping) {
+            Log.d(TAG, "afterTextChanged: "+"typing");
+            // Send notification for start typing event
+            isTyping = true;
+        }
+        timer.cancel();
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+                           @Override
+                           public void run() {
+                               isTyping = false;
+                               Log.d(TAG, "afterTextChanged: "+"stopped typing");
+                           }
+                       }, DELAY
+        );
+    }
+};
+
 
     private void setupToolbar() {
         //https://medium.com/android-grid/how-to-implement-back-up-button-on-toolbar-android-studio-c272bbc0f1b0
@@ -175,6 +264,7 @@ public class MessageActivity extends AppCompatActivity {
         timeStamp = sdf.format(new Date());
 
         String msg = text_send.getText().toString();
+
         if (!msg.equals("")) {
             //retrieve data from contactfragment
             //https://www.journaldev.com/9412/android-shared-preferences-example-tutorial
@@ -330,19 +420,43 @@ public class MessageActivity extends AppCompatActivity {
             isConnected = false;
         }
     }
+    //contactFragment
     BroadcastReceiver statusChecker=new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String number=intent.getStringExtra("number");
-            assert number != null;
-            if(number.equals(Mobileno)){
-              String status=  intent.getStringExtra("statuscheck");
-                textViewStatus.setText(status);
+            number = intent.getStringExtra("number");
+            typing = intent.getStringExtra("isTyping");
+            if (number.equals(Mobileno)) {
+                status = intent.getStringExtra("statuscheck");
+                typing = intent.getStringExtra("isTyping");
 
+                if(typing.length() > 13){
+                    firstFourChars = typing.substring(0, 13);
+                }else{
+                    firstFourChars=typing;
+                }
+
+               if(firstFourChars.equals(number)){
+                   textViewStatus.setText("typing...");
+               }else{
+                   textViewStatus.setText(status);
+               }
             }
 
         }
     };
+
+public void checkTypingStatus(String typing){
+    SharedPreferences sharedPreferences =this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+    String base64id=sharedPreferences.getString(LOOGED_IN_USER_ID,null);
+    FirebaseDatabase database= FirebaseDatabase.getInstance();
+    assert base64id != null;
+    DatabaseReference myRef =database.getReference("User").child(base64id.concat("=="));
+
+    HashMap<String,Object> hashMap=new HashMap<>();
+    hashMap.put("isTyping",typing);
+    myRef.updateChildren(hashMap);
+}
     public void status(String status){
         SharedPreferences sharedPreferences =this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         String base64id=sharedPreferences.getString(LOOGED_IN_USER_ID,null);
@@ -365,7 +479,10 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        status("offline");
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+        String  timeStamp1 = sdf.format(new Date());
+        status("Last Seen :"+timeStamp1);
+        checkTypingStatus("noOne");
     }
     public void onDestroy() {
         super.onDestroy();
@@ -373,6 +490,7 @@ public class MessageActivity extends AppCompatActivity {
         unregisterReceiver(UpdateBroadcastReceiver);
         unregisterReceiver(receiver);
         unregisterReceiver(statusChecker);
+
     }
 
 }
