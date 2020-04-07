@@ -26,38 +26,35 @@ import java.util.Random;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMessagingServ";
 
-
     public String MessaageBody,Title,sernderID;
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived( remoteMessage );
         int notificationID = new Random().nextInt(3000);
-        Log.d( TAG, "onMessageReceived: "+remoteMessage.getData() );
+        Log.d(TAG, "onMessageReceived: "+"remoteMessage.getFrom()");
         try {
             //Receiver  receive the message.
             JSONObject jsonObject = new JSONObject( remoteMessage.getData() );
             MessaageBody=jsonObject.getString( "Body" ) ;
             Title=jsonObject.getString( "Name" );
             sernderID=jsonObject.getString( "SenderID" );
+
             DatabaseHelper md = new DatabaseHelper( this );
             Message message=new Message();
-
+//receiver side
             message.setSenderID( jsonObject.getString( "SenderID" ) );
             message.setConversionID(jsonObject.getString( "SenderID" ) );
             message.setMessageID( jsonObject.getString( "MessageID" ) );
             message.setBody( jsonObject.getString( "Body" ) );
-            Log.d( TAG, "onMessageReceived: "+ jsonObject.getString( "Body" ) );
             message.setTimeStamp(jsonObject.getString( "TimeStamp" ) );
             md.insert( message );
 
         } catch (Exception e) {
 
         }
-        //notification channelid set on contactfragment.KzkxODkyODgxNDkxMg
-        Log.d(TAG, "onMessageReceived56: "+sernderID);
+        //notification channelid and its regis in contactFragment
         Intent intent = new Intent(getApplicationContext(), MessageActivity.class);
-        intent.putExtra("hisUID",sernderID);
-      // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  PendingIntent.FLAG_ONE_SHOT
+        intent.putExtra("ReceiverUserID", sernderID);
 
         PendingIntent pendingIntent=PendingIntent.getActivity(
                 this,
@@ -74,9 +71,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setContentIntent( pendingIntent )
                 .setDefaults( Notification.DEFAULT_SOUND)
                 .setAutoCancel(true);
-
-
-
         NotificationManager notificationManager =
                 ( NotificationManager ) getSystemService( Context.NOTIFICATION_SERVICE);
 
@@ -85,7 +79,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
     @Override
     public void onNewToken(String token) {
-        Log.d(TAG, "Refreshed token: " + token);
 
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the

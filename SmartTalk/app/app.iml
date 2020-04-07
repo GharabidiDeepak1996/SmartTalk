@@ -200,5 +200,6 @@
     <orderEntry type="library" name="Gradle: de.hdodenhof:circleimageview:3.0.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.miguelcatalan:materialsearchview:1.4.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.intuit.sdp:sdp-android:1.0.4@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.splitwise:tokenautocomplete:3.0.1@aar" level="project" />
   </component>
 </module>

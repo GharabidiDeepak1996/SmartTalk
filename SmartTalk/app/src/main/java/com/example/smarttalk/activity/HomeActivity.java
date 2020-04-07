@@ -56,7 +56,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant.LOOGED_IN_USER_ID;
 import static com.example.smarttalk.fragment.ProfileFragment.THIS_BROADCAST_FOR_PROFILE_IMAGE;
 
-public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener  {
+public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
     //https://www.androidhive.info/2015/09/android-material-design-working-with-tabs/
 
     @BindView(R.id.toolbar)
@@ -73,32 +73,33 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
     TextView title;
     MenuItem menuItem;
 
-    private static final String TAG = "HomeActivity";
     private NetworkConnection receiver;
     private boolean isConnected = false;
+    SharedPreferences sharedPreferences;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate( savedInstanceState );
-        setContentView( R.layout.home_activity );
-        ButterKnife.bind( this );
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.home_activity);
+        ButterKnife.bind(this);
 
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         receiver = new NetworkConnection();
         registerReceiver(receiver, filter);
 
-        IntentFilter intentFilter1=new IntentFilter( THIS_BROADCAST_FOR_PROFILE_IMAGE );
-        registerReceiver( broadcastReceiverForprofileImage,intentFilter1 );
+        IntentFilter intentFilter1 = new IntentFilter(THIS_BROADCAST_FOR_PROFILE_IMAGE);
+        registerReceiver(broadcastReceiverForprofileImage, intentFilter1);
 
         //setting the title
         title.setText("SmartTalk");
         //placing toolbar in place of actionbar
-        setSupportActionBar( toolbar );
-        tabLayout.setupWithViewPager( viewPager );
+        setSupportActionBar(toolbar);
+        tabLayout.setupWithViewPager(viewPager);
         viewPager.addOnPageChangeListener(this);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        SharedPreferences sharedPreferences = this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+
+        sharedPreferences = this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         String url = sharedPreferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
         Glide.with(this)
                 .load(url)
@@ -106,17 +107,17 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
                 .into(profile_image);
 
         List<String> list = new ArrayList<>();
-        list.add( "Chats" );
-        list.add( "Contacts" );
+        list.add("Chats");
+        list.add("Contacts");
         list.add("Profile");
-        TabLayoutAdapter tabLayoutAdapter = new TabLayoutAdapter( getSupportFragmentManager(), list );
-        viewPager.setAdapter( tabLayoutAdapter );
+        TabLayoutAdapter tabLayoutAdapter = new TabLayoutAdapter(getSupportFragmentManager(), list);
+        viewPager.setAdapter(tabLayoutAdapter);
 
 
-        DatabaseHelper databaseHelper = new DatabaseHelper( this );
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
         //this is for searchview
 
-        materialSearchView.setOnQueryTextListener( new MaterialSearchView.OnQueryTextListener() {
+        materialSearchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -125,19 +126,17 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
             @Override
             public boolean onQueryTextChange(String newText) {
 
-               databaseHelper.Contactsearch( newText );
-               databaseHelper.Chatsearch(newText);
-                Log.d( TAG, "onQueryTextChange: "+newText );
-
+                databaseHelper.Contactsearch(newText);
+                databaseHelper.Chatsearch(newText);
                 return false;
             }
-        } );
+        });
     }
-    BroadcastReceiver broadcastReceiverForprofileImage=new BroadcastReceiver() {
+
+    BroadcastReceiver broadcastReceiverForprofileImage = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-         String url=intent.getStringExtra("profileImage");
-
+            String url = intent.getStringExtra("profileImage");
             Glide.with(context)
                     .load(url)
                     .placeholder(R.mipmap.avatar)
@@ -148,10 +147,9 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d( TAG, "onCreateOptionsMenu: " + menu );
-        getMenuInflater().inflate( R.menu.menu_item, menu );
-         menuItem = menu.findItem( R.id.action_search );
-        materialSearchView.setMenuItem( menuItem );
+        getMenuInflater().inflate(R.menu.menu_item, menu);
+        menuItem = menu.findItem(R.id.action_search);
+        materialSearchView.setMenuItem(menuItem);
         return true;
     }
 
@@ -162,14 +160,13 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onPageSelected(int position) {
-        Log.d(TAG, "onPageSelected: "+position);
-if(position==2){
-   // menuItem.setVisible(false);
-    getSupportActionBar().hide();
-}else {
-  //  menuItem.setVisible(true);
-getSupportActionBar().show();
-}
+        if (position == 2) {
+            // menuItem.setVisible(false);
+            getSupportActionBar().hide();
+        } else {
+            //  menuItem.setVisible(true);
+            getSupportActionBar().show();
+        }
 
     }
 
@@ -190,7 +187,6 @@ getSupportActionBar().show();
 
         }
 
-
         private boolean isNetworkAvailable(Context context) {
             ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (connectivity != null) {
@@ -198,7 +194,7 @@ getSupportActionBar().show();
                 if (info != null) {
                     for (int i = 0; i < info.length; i++) {
                         if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-                            if(!isConnected){
+                            if (!isConnected) {
 
                                 View parentLayout = findViewById(android.R.id.content);
                                 Snackbar snackbar = Snackbar.make(parentLayout, "Internet Connection is Active", Snackbar.LENGTH_SHORT);
@@ -221,39 +217,39 @@ getSupportActionBar().show();
             return false;
         }
     }
+
     @Override
     protected void onDestroy() {
 
         super.onDestroy();
-        unregisterReceiver( broadcastReceiverForprofileImage );
+        unregisterReceiver(broadcastReceiverForprofileImage);
         unregisterReceiver(receiver);
     }
-public void status(String status){
-    SharedPreferences sharedPreferences =this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-    String base64id=sharedPreferences.getString(LOOGED_IN_USER_ID,null);
- if(base64id==null){
-     Log.d(TAG, "status: ");
- }else {
-     FirebaseDatabase database = FirebaseDatabase.getInstance();
-     DatabaseReference myRef = database.getReference("User").child(base64id.concat("=="));
-     HashMap<String, Object> hashMap = new HashMap<>();
-     hashMap.put("status", status);
-     myRef.updateChildren(hashMap);
- }
-}
+
+    public void status(String status) {
+        String base64id = sharedPreferences.getString(LOOGED_IN_USER_ID, null);
+        if (base64id == null) {
+        } else {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("User").child(base64id.concat("=="));
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("status", status);
+            myRef.updateChildren(hashMap);
+        }
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-       status("online");
+        status("online");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
-        String  timeStamp1 = sdf.format(new Date());
-        status("Last Seen :"+timeStamp1);
+        String timeStamp1 = sdf.format(new Date());
+        status("Last Seen :" + timeStamp1);
     }
 }
 

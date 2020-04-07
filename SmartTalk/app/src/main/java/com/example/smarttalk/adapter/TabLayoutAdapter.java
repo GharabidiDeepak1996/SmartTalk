@@ -13,13 +13,11 @@ import com.example.smarttalk.fragment.ProfileFragment;
 import java.util.List;
 
 public class TabLayoutAdapter extends FragmentStatePagerAdapter {
-    private static final String TAG = "TabLayoutAdapter";
     private List<String> List1;
 
     public TabLayoutAdapter(FragmentManager fm, List<String> List) {
         super( fm );
-        Log.d( TAG, "TabLayoutAdapter: "+fm );
-        Log.d( TAG, "TabLayoutAdapter: "+List );
+
         List1=List;
     }
 

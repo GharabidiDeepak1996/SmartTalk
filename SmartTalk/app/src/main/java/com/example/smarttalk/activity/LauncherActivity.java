@@ -14,9 +14,7 @@ import com.example.smarttalk.activity.GetStartedActivity;
 import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME;
 
 public class LauncherActivity extends AppCompatActivity {
-
-    private static final String TAG = "LauncherActivity";
-   public static final String IS_ALREADY_LOGIN = "is_already_login";
+    public static final String IS_ALREADY_LOGIN = "is_already_login";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,14 +24,11 @@ public class LauncherActivity extends AppCompatActivity {
         boolean isLogin = sharedPreferences.getBoolean(IS_ALREADY_LOGIN, false);
 
         if(isLogin){
-            Log.d( TAG, "onCreate: "+isLogin );
-
             Intent intent=new Intent( this, AuthenticationActivity.class );
             startActivity( intent );
 
         }
         else{
-
             Intent intent=new Intent( this, GetStartedActivity.class );
             startActivity( intent );
 

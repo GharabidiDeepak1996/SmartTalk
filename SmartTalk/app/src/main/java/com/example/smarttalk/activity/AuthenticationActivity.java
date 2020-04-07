@@ -27,37 +27,27 @@ import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConsta
 public class AuthenticationActivity extends AppCompatActivity {
     //https://firebase.google.com/docs/auth/android/manage-users
     private static final String TAG = "AuthenticationActivity";
-   // public static final String PREFERENCE_NAME = "mydata";
-    String UserID;
+    String UserID,number;
     FirebaseDatabase database;
-
-    String number;
-        private FirebaseAuth mFirebaseAuth;
+    private FirebaseAuth mFirebaseAuth;
     public static final int RC_SIGN_IN = 1;
     private FirebaseAuth.AuthStateListener mAuthStateListner;
 
     List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.PhoneBuilder().build() );
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
-        /*  setContentView( R.layout.home_activity );*/
-
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthStateListner = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                Log.d( TAG, "onAuthStateChanged: " + firebaseAuth );
-
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     number = user.getPhoneNumber();
                     database();
-                    Log.d( TAG, "PhoneNUMBER: " + number );
-
                 } else {
                     startActivityForResult(
                             AuthUI.getInstance()
@@ -73,27 +63,19 @@ public class AuthenticationActivity extends AppCompatActivity {
         };
        database=FirebaseDatabase.getInstance();
         database.setPersistenceEnabled( true );
-
     }
 
     public void database() {
         final String user = number;
-        Log.d( TAG, "database: " + user );
-        //Base64
         final byte[] encoded = Base64.encode(user.getBytes(), Base64.DEFAULT );
          FirebaseDatabase.getInstance();
         DatabaseReference myRef=database.getReference("User");
-     //   DatabaseReference myRef=FirebaseDatabase.getInstance().getReference("User");
-        //unique ID will get.
          UserID=myRef.push().getKey();
         myRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d( TAG, "onDataChange: " + dataSnapshot );
-
                 if (dataSnapshot.child( new String( encoded ).trim() ).exists()) {
                     //existing user
-                  //  Toast.makeText( getApplicationContext(), "Username already exists. Please try other username.", Toast.LENGTH_SHORT ).show();
                     Intent intent = new Intent( AuthenticationActivity.this, HomeActivity.class );
                     startActivity( intent );
                     //Save Contact Number into Shared Preference
@@ -102,7 +84,6 @@ public class AuthenticationActivity extends AppCompatActivity {
                     //https://github.com/orhanobut/hawk
                     SharedPreferences sharedPreferences=getSharedPreferences( SHARED_PREF_NAME ,MODE_PRIVATE);
                     SharedPreferences.Editor editor=sharedPreferences.edit();
-                    Log.d( TAG, "onDataChange: "+user );
                     editor.putString( LOGGED_IN_USER_CONTACT_NUMBER, user);
                     editor.apply();
 
@@ -119,10 +100,8 @@ public class AuthenticationActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                Log.w( TAG, "Failed to read value.", error.toException() );
             }
         } );
-        Log.d( TAG, "database: " + user );
         finish();
     }
     @Override

@@ -63,7 +63,6 @@ public class ContactsFragment extends Fragment {
     private User contact;
 
     public static final String THIS_BROADCAST_FOR_CONTACT_SEARCHBAR = "this is for contact searchBar";
-    private static final String TAG = "ContactsFragment";
     //private static final String TAG = "MyFirebaseMessagingServ";
 
     public ContactsFragment() {
@@ -89,18 +88,15 @@ public class ContactsFragment extends Fragment {
 //line divider bewt the cardview
         DividerItemDecoration itemDecor = new DividerItemDecoration( getActivity(), linearLayoutManager.getOrientation() );
         recyclerView.addItemDecoration( itemDecor );
-        Log.d( TAG, "Context: "+getActivity() );
 //sharedpreferences
         mContext = getActivity();
         mPreference = mContext.getSharedPreferences( AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE );
         mLoggedInUserContactNumber = mPreference.getString( AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_CONTACT_NUMBER, null );
 
-        Log.d( TAG, "onCreateView: " + mLoggedInUserContactNumber );
 
         databaseHelper = new DatabaseHelper( getActivity() );
         contactmodel = new ArrayList<>();
         contactmodel = databaseHelper.display();
-        Log.d( TAG, "contactmodel: "+contactmodel );
         mfetchAdapter = new ContactAdapter( getActivity(), contactmodel );
         recyclerView.setAdapter( mfetchAdapter );
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -125,11 +121,11 @@ public class ContactsFragment extends Fragment {
                         user.setUserId( user.getUserId().replace( "==", "" ) );
                     }
 
-                    Intent status1=new Intent(STATUS_CHECKER);
-                    status1.putExtra("statuscheck",user.getStatus());
-                    status1.putExtra("number",user.getMobilenumber());
-                    status1.putExtra("isTyping",user.getIsTyping());
-                    mContext.sendBroadcast(status1);
+                    Intent intentstatus=new Intent(STATUS_CHECKER);
+                    intentstatus.putExtra("statuscheck",user.getStatus());
+                    intentstatus.putExtra("number",user.getMobilenumber());
+                    intentstatus.putExtra("isTyping",user.getIsTyping());
+                    mContext.sendBroadcast(intentstatus);
 
                     if (mLoggedInUserContactNumber != null && !mLoggedInUserContactNumber.equalsIgnoreCase( user.getMobilenumber() )) {
 
@@ -169,7 +165,6 @@ public class ContactsFragment extends Fragment {
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                Log.w( TAG, "Failed to read value.", error.toException() );
             }
         } );
 
@@ -177,17 +172,12 @@ public class ContactsFragment extends Fragment {
     }
 
     private void checkForCurrentLoggedInUser(final User user) {
-
-        Log.d( TAG, "checkForCurrentLoggedInUser: user Contanct Number : " + user.getUserId());
-
         //save the data login user in sharedpreference TO MESSAGE ACTIVITY
         SharedPreferences.Editor edit = mPreference.edit();
         edit.putString( AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_NAME, user.getFirstname() + " " + user.getLastname() );
         edit.putString( AppConstant.SharedPreferenceConstant.LOOGED_IN_USER_ID, user.getUserId() );
-        Log.d( TAG, "userID: " + user.getUserId() );
         edit.apply();
 
-        Log.d(TAG, "checkForCurrentLoggedInUser: "+user.getUserId());
         FirebaseMessaging.getInstance().subscribeToTopic( user.getUserId() )
                 .addOnCompleteListener( new OnCompleteListener<Void>() {
                     @Override
@@ -196,9 +186,6 @@ public class ContactsFragment extends Fragment {
                         if (!task.isSuccessful()) {
                             msg = getString( R.string.msg_subscribe_failed );
                         }
-                        Log.d( TAG, "onComplete: " + task.isSuccessful() );
-                        Log.d( TAG, "onComplete: User ID : " + user.getUserId() );
-                        //Toast.makeText(ContactsFragment.this, msg, Toast.LENGTH_SHORT).show();
                     }
                 } );
     }
@@ -206,7 +193,6 @@ public class ContactsFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             List<User> data = ( List<User> ) intent.getSerializableExtra( "contactdata" );
-            Log.d(TAG, "message_sended: "+data);
            mfetchAdapter.setCollection( data );
         }
     };

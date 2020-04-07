@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -16,7 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smarttalk.R;
-import com.example.smarttalk.Schedule.MessageSchedule;
+import com.example.smarttalk.schedule.activity.CreateSchedule;
+import com.example.smarttalk.schedule.activity.MessageSchedule;
 import com.example.smarttalk.adapter.ChatAdapter;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
 import com.example.smarttalk.modelclass.Chat;
@@ -32,13 +33,16 @@ import static com.example.smarttalk.activity.MessageActivity.THIS_BROADCAST;
 
 
 public class ChatsFragment extends Fragment {
-    private static final String TAG = "ChatsFragment";
     @BindView(R.id.chat_recycler_view)
     RecyclerView mrecyclerview;
-    List<Chat> mchat;
-    Boolean isExists;
-    int indexToremove;
-    ChatAdapter mChatAdapter;
+    private List<Chat> mchat;
+    private Boolean isExists;
+    private int indexToremove;
+    private ChatAdapter mChatAdapter;
+    private FloatingActionButton febMenu,febCreate,febClose;
+    public boolean isClick=false;
+    Float translationY=100f;
+    OvershootInterpolator interpolator=new OvershootInterpolator();
 
     public static final String THIS_BROADCAST_FOR_CHAT_SEARCHBAR = "this is for searchBar";
     @Override
@@ -58,21 +62,17 @@ public class ChatsFragment extends Fragment {
         // context=container.getContext();
         DatabaseHelper databaseHelper= new DatabaseHelper( container.getContext() );
         mchat = new ArrayList<>();
-        mchat = databaseHelper.chatList();
+       mchat = databaseHelper.chatList();
         mChatAdapter = new ChatAdapter( getActivity(), mchat );
         mrecyclerview.setAdapter( mChatAdapter );
+        febMenu=view.findViewById(R.id.floating_button_menu);
+        febCreate=view.findViewById(R.id.floating_button_create);
+        febClose=view.findViewById(R.id.floating_button_cancel);
+        floatingButton();
+        floatingAnimation();
+onClickFloatingButtonCancelScheduleMessages();
+onClickFloatingButtonCreateMessageSchedule();
 
-
-//floating button
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.floating_button);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Click action
-                Intent intent = new Intent(getActivity(), MessageSchedule.class);
-                startActivity(intent);
-            }
-        });
         return view;
     }
 
@@ -82,7 +82,6 @@ public class ChatsFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
             String ConversionID = bundle.getString( "ConversionID" );
-            Log.d( TAG, "conversion12: " + ConversionID );
             Receiver( ConversionID);
         }
     };
@@ -96,13 +95,11 @@ try {
         if (chat.message.getConversionID().equals( ConversionID )) {
             isExists = true;
             indexToremove = mchat.indexOf( chat );
-            Log.d( TAG, "Receiver153: " + indexToremove );
             break;
         }
 
     }
 
-    Log.d( TAG, "Final Indext to update: " + indexToremove );
     mChatAdapter.updateChatList( currentChat, indexToremove, isExists );
 }catch (Exception e){
 
@@ -138,5 +135,63 @@ private BroadcastReceiver broadcastforsearchbar=new BroadcastReceiver() {
         super.onDestroyView();
         getActivity().unregisterReceiver( broadcastReceiver );
 
+    }
+    public void onClickFloatingButtonCreateMessageSchedule(){
+febCreate.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(getActivity(), CreateSchedule.class);
+
+        startActivity(intent);
+    }
+});
+    }
+    public void onClickFloatingButtonCancelScheduleMessages(){
+febClose.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(getActivity(), MessageSchedule.class);
+        startActivity(intent);
+    }
+});
+    }
+   public void floatingButton(){
+        febMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isClick==true){
+                    closeSubMenusFab();
+                } else {
+                    openSubMenusFab();
+                }
+            }
+        });
+   }
+   public void floatingAnimation(){
+        febClose.setAlpha(0f);
+        febCreate.setAlpha(0f);
+
+        febCreate.setTranslationY(translationY);
+       febClose.setTranslationY(translationY);
+   }
+    //closes FAB submenus
+    private void closeSubMenusFab(){
+        febMenu.animate().setInterpolator(interpolator).rotationBy(0f).setDuration(300).start();
+
+        febCreate.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start();
+        febClose.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start();
+        febMenu.setImageResource(R.drawable.ic_add_black_24dp);
+        isClick = false;
+    }
+
+    //Opens FAB submenus
+    private void openSubMenusFab(){
+        febMenu.animate().setInterpolator(interpolator).rotationBy(45f).setDuration(300).start();
+
+
+        febCreate.animate().translationY(0f).alpha(1f).setInterpolator(interpolator).setDuration(300).start();
+        febClose.animate().translationY(0f).alpha(1f).setInterpolator(interpolator).setDuration(300).start();
+        febMenu.setImageResource(R.drawable.ic_cancel_black_24dp);
+        isClick = true;
     }
 }

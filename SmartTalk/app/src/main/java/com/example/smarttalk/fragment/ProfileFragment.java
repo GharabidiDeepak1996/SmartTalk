@@ -60,9 +60,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private static final int PICK_IMAGE = 1;
     private String userID;
     private StorageReference filepath;
-    FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;
     private Uri imageUri;
-    private static final String TAG = "ProfileFragment";
     public static final String THIS_BROADCAST_FOR_PROFILE_IMAGE = "this is for profile image";
 
     //https://www.simplifiedcoding.net/firebase-storage-example/
@@ -116,11 +115,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: "+data);
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null && data.getData()!=null) {
             imageUri = data.getData();
             Profileimage.setImageURI(imageUri);
-            Log.d(TAG, "onActivityResult: "+imageUri);
             uploadFile();
             //fetching the uploaded image for the firebase
             filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -150,7 +147,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private void uploadFile() {
         if (imageUri != null) {
             filepath = FirebaseStorage.getInstance().getReference().child("Profile_Imamge").child(userID);
-            Log.d(TAG, "uploadFile1: "+userID);
             Bitmap bitmap = null;
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(mcontext.getContentResolver(), imageUri);
@@ -162,7 +158,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             byte[] data1 = baos.toByteArray();
             //upload in firebase.
-            Log.d(TAG, "uploadFile2: "+data1);
             UploadTask uploadTask = filepath.putBytes(data1);
             //Log.d(TAG, "uploadFile: "+uploadTask.getSnapshot().getUploadSessionUri());
             uploadTask.addOnFailureListener(new OnFailureListener() {

@@ -17,6 +17,7 @@ import com.example.smarttalk.constants.AppConstant;
 import com.example.smarttalk.fragment.ChatsFragment;
 import com.example.smarttalk.modelclass.Chat;
 import com.example.smarttalk.modelclass.Message;
+import com.example.smarttalk.modelclass.ScheduleMessage;
 import com.example.smarttalk.modelclass.User;
 import com.google.gson.Gson;
 
@@ -27,11 +28,12 @@ import java.util.List;
 import static android.content.Context.MODE_PRIVATE;
 import static com.example.smarttalk.fragment.ChatsFragment.THIS_BROADCAST_FOR_CHAT_SEARCHBAR;
 import static com.example.smarttalk.fragment.ContactsFragment.THIS_BROADCAST_FOR_CONTACT_SEARCHBAR;
+import static com.example.smarttalk.schedule.activity.MessageSchedule.THIS_BROADCAST_FOR_NOTIFY_THE_ADAPTER;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
+    private static final String TAG = "DatabaseHelper";
     public static final String DATABASE_NAME = "smarttalk.db";
     public static final int DATABASE_VERSION = 12;
-    private static final String TAG = "DatabaseHelper";
     Context context;
 
     public DatabaseHelper(@Nullable Context context) {
@@ -69,8 +71,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public static final String MessageID = "MESSAGEID";
     }
 
+    public class ScheduleMessages {
+        public static final String TABLE_NAME = "SCHEDULEMESSAGE";
+        public static final String SR_NO_ID = "SRNO_ID";
+        public static final String SenderID = "SENDER_ID";
+        public static final String ReceiverID = "RECEIVER_ID";
+        public static final String MessageID = "MESSAGE_ID";
+        public static final String MessageBody = "MESSAGEBODY";
+        public static final String TimeStamp = "TIMESTAMP";
+        public static final String SenderName = "SENDER_NAME";
+        public static final String ReceiverName = "RECEIVER_NAME";
+
+    }
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        //Table for ScheduleMessages
+        String ScheduleMessagesquery = "CREATE TABLE " + ScheduleMessages.TABLE_NAME + "( "
+                + ScheduleMessages.SR_NO_ID + " INTEGER PRIMARY KEY AUTOINCREMENT , "
+                + ScheduleMessages.SenderID + " TEXT, "
+                + ScheduleMessages.ReceiverID + " TEXT, "
+                + ScheduleMessages.MessageID + " TEXT, "
+                + ScheduleMessages.MessageBody + " TEXT, "
+                + ScheduleMessages.TimeStamp + " TEXT,"
+                + ScheduleMessages.SenderName + " TEXT,"
+                + ScheduleMessages.ReceiverName + " TEXT"
+                + ")";
+        sqLiteDatabase.execSQL(ScheduleMessagesquery);
+
         //Table Contacts
         String Contactsquery = "create table " + Contacts.TABLE_NAME + " ( " +
                 Contacts.ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
@@ -130,7 +158,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         chat.unseencount = 0;
         chat.message = message;
         insertChats(chat);
-        Log.d(TAG, "insert: " + message.getMessageID());
     }
 
     //messageupdate status
@@ -140,7 +167,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Messages.Delivery_Status_ALL, deliverystaus);
         long raw = database.update(Messages.TABLE_NAME, contentValues, Messages.MessageID + "=?", new String[]{String.valueOf(messageID)});
-        Log.d(TAG, "inside updateStudent : Row : " + raw);
+
         Intent intent = new Intent(MessageActivity.UPDATE_MESSAGE_STATUS_BRODCAST);
         intent.putExtra("Messageid", messageID);
         context.sendBroadcast(intent);
@@ -157,31 +184,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(Contacts.LAST_NAME, contact.getLastname());
         contentValues.put(Contacts.MOBILE_NUMBER, contact.getMobilenumber());
         contentValues.put(Contacts.PROFILE_IMAGE, contact.getProfileImageURI());
-        contentValues.put(Contacts.status,contact.getStatus());
-        Log.d(TAG, "insertima: "+contact.getProfileImageURI());
+        contentValues.put(Contacts.status, contact.getStatus());
         // long row = database.insertWithOnConflict( Contacts.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE );
         long row = database.insertWithOnConflict(Contacts.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
-        Log.d(TAG, "Inside insertStudent() -> Row : " + row);
     }
-    public void updatetheprofileImageandstatus(String profileImages, String status,String number) {
+
+    public void updatetheprofileImageandstatus(String profileImages, String status, String number) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        Log.d(TAG, "updatetheprofileImageandstatus: ");
         values.put(Contacts.PROFILE_IMAGE, profileImages);
         values.put(Contacts.status, status);
-        ChatsFragment chat=new ChatsFragment();
-        db.update(Contacts.TABLE_NAME, values,"user_mobile = ?",new String[]{number});
+        ChatsFragment chat = new ChatsFragment();
+        db.update(Contacts.TABLE_NAME, values, "user_mobile = ?", new String[]{number});
     }
+
+    //this for scheduling messages.
     public List<User> display() {
-        List<User> ContactList = new ArrayList<>();
+
         String query = "SELECT * FROM " + Contacts.TABLE_NAME;
 
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery(query, null);
-        StringBuffer stringBuffer = new StringBuffer();
-        Log.d(TAG, "display:string buffer " + stringBuffer);
-        // Student student1=null; optional
-
+        List<User> ContactList = new ArrayList<>();
         while (cursor.moveToNext()) {
             User contact = new User();
             String user_id = cursor.getString(cursor.getColumnIndex(Contacts.USER_ID));
@@ -189,13 +213,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String last_name = cursor.getString(cursor.getColumnIndex(Contacts.LAST_NAME));
             String mobile_number = cursor.getString(cursor.getColumnIndex(Contacts.MOBILE_NUMBER));
 
-            Log.d(TAG, "displayData:First Name: " + first_name + ",Lastname: " + last_name + ",Mobilenumber :" + mobile_number);
             contact.setUserId(user_id);
             contact.setFirstname(first_name);
             contact.setLastname(last_name);
             contact.setMobilenumber(mobile_number);
-
-            stringBuffer.append(contact);
             ContactList.add(contact);
 
         }
@@ -210,7 +231,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getReadableDatabase();
         String query = "SELECT * FROM " + Messages.TABLE_NAME + " WHERE " + Messages.MessageID + " = '" + messageId + "' ;";
         Cursor cursor = database.rawQuery(query, null);
-      //  Log.d(TAG, "Cursor Count : " + cursor.getCount());
+        //  Log.d(TAG, "Cursor Count : " + cursor.getCount());
         Message message = new Message();
 
         while (cursor.moveToNext()) {
@@ -237,7 +258,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase data = this.getReadableDatabase();
         String query = "SELECT * FROM " + Messages.TABLE_NAME + " WHERE " + Messages.conversionID + " = '" + conversionID + "';";
         Cursor cursor = data.rawQuery(query, null);
-        Log.d(TAG, "Cursor Count : " + cursor.getCount());
 
 
         while (cursor.moveToNext()) {
@@ -260,7 +280,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             MessageList.add(message);
             for (int i = 0; i <= MessageList.size(); i++) {
                 String message1f = message.getMessageID();
-                Log.d(TAG, "getConversionID1: " + message1f);
 
                 Intent intent = new Intent(MessageActivity.MESSAGEID_STATUS_UPDATE);
                 intent.putExtra("Messagestatus", message1f);
@@ -268,7 +287,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
-        Log.d(TAG, "getConversionID: "+MessageList.size());
         cursor.close();
         return MessageList;
     }
@@ -292,10 +310,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " ON " + Messages.TABLE_NAME + "." + Messages.MessageID + " = " + Chats.TABLE_NAME + "." + Chats.MessageID +
                 " ORDER BY " + Messages.TimeStamp + " DESC"
                 + " ;";
-        Log.d(TAG, " chatList() ==> Query : " + query);
+        //   Log.d(TAG, " chatList() ==> Query : " + query);
 
         Cursor cursor = database.rawQuery(query, null);
-        Log.d(TAG, "chatList() ==>> cursor_count: " + cursor.getCount());
+        // Log.d(TAG, "chatList() ==>> cursor_count: " + cursor.getCount());
         List<Chat> chatList = new ArrayList<>();
 
         while (cursor.moveToNext()) {
@@ -327,9 +345,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-     //fetching data through by converstion ID
+    //fetching data through by converstion ID
     public Chat getChatByConversationId(String conversionID) {
-        Log.d(TAG, "getChatByConversationId: " + conversionID);
 
         SQLiteDatabase database = this.getReadableDatabase();
         String query = "SELECT * FROM " + Chats.TABLE_NAME +
@@ -337,10 +354,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " ON " + Contacts.USER_ID + " = " + Chats.TABLE_NAME + "." + Chats.conversionID +
                 " JOIN " + Messages.TABLE_NAME +
                 " ON " + Messages.TABLE_NAME + "." + Messages.MessageID + " = " + Chats.TABLE_NAME + "." + Chats.MessageID + " WHERE " + Chats.TABLE_NAME + "." + Chats.conversionID + " ='" + conversionID + "';";
-        Log.d(TAG, " Query : " + query);
 
         Cursor cursor = database.rawQuery(query, null);
-        Log.d(TAG, "getChatByConversationId() ==> cursor_count: " + cursor.getCount());
         cursor.moveToFirst();
         Chat chat = new Chat();
         String chatId = cursor.getString(cursor.getColumnIndex(Chats.CHAT_ID));
@@ -376,7 +391,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " ON " + Messages.TABLE_NAME + "." + Messages.MessageID + " = " + Chats.TABLE_NAME + "." + Chats.MessageID +
                 " WHERE " + Contacts.FIRST_NAME + " LIKE '%" + Chat + "%'"
                 + " ;";
-        Log.d(TAG, " Query : " + query);
         Cursor cursor = database.rawQuery(query, null);
         List<Chat> list = new ArrayList<>();
         Chat chat = new Chat();
@@ -401,7 +415,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             chat.user = mUser;
             list.add(chat);
         }
-        Log.d(TAG, "listsize: " + list.size());
 
         Intent intent = new Intent(THIS_BROADCAST_FOR_CHAT_SEARCHBAR);
         intent.putExtra("data", (Serializable) list);
@@ -409,12 +422,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void Contactsearch(String contact) {
-        Log.d(TAG, "Contactsearch: " + contact);
         SQLiteDatabase database = this.getReadableDatabase();
         String query = "SELECT * FROM " + Contacts.TABLE_NAME
                 + " WHERE " + Contacts.FIRST_NAME + " LIKE '%" + contact + "%'"
                 + " ;";
-        Log.d(TAG, " contactquery : " + query);
 
         Cursor cursor = database.rawQuery(query, null);
         List<User> list = new ArrayList<>();
@@ -427,7 +438,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             mUser.setMobilenumber(cursor.getString(cursor.getColumnIndex(Contacts.MOBILE_NUMBER)));
             list.add(mUser);
         }
-        Log.d(TAG, "listsize: " + list.size());
 
         Intent intent = new Intent(THIS_BROADCAST_FOR_CONTACT_SEARCHBAR);
         intent.putExtra("contactdata", (Serializable) list);
@@ -445,15 +455,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             message.setMessageID(cursor.getString(cursor.getColumnIndex(Messages.MessageID)));
             MessagePendingList.add(message);
-            for(int i=0;i<=MessagePendingList.size();i++){
-                String messagepending=message.MessageID;
-                Log.d(TAG, "Pendingmessagesupdate_Status: "+messagepending);
+            for (int i = 0; i <= MessagePendingList.size(); i++) {
 
                 SharedPreferences preferences = context.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 Gson gson = new Gson();
                 String jsonFavorites = gson.toJson(MessagePendingList);
-                editor.putString(AppConstant.SharedPreferenceConstant.PENDING_MESSAGE_SENDTO_DATABASE,jsonFavorites);
+                editor.putString(AppConstant.SharedPreferenceConstant.PENDING_MESSAGE_SENDTO_DATABASE, jsonFavorites);
                 editor.apply();
             }
         }
@@ -462,20 +470,90 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return MessagePendingList;
     }
 
-
-    public void namelast(String receiver_id){
-        SQLiteDatabase data = this.getReadableDatabase();
-        String query = "SELECT * FROM " + Messages.TABLE_NAME + " WHERE " + Messages.Delivery_Status_ALL + " = '" + "message pendding" + "';";
-        Cursor cursor = data.rawQuery(query, null);
+    public void schedulingMessage(ScheduleMessage scheduleMessage) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ScheduleMessages.SenderID, scheduleMessage.getSenderID());
+        contentValues.put(ScheduleMessages.ReceiverID, scheduleMessage.getReceiverID());
+        contentValues.put(ScheduleMessages.MessageID, scheduleMessage.getMessageID());
+        contentValues.put(ScheduleMessages.MessageBody, scheduleMessage.getMessageBody());
+        contentValues.put(ScheduleMessages.ReceiverName, scheduleMessage.getReceiverName());
+        contentValues.put(ScheduleMessages.SenderName, scheduleMessage.getSenderName());
+        contentValues.put(ScheduleMessages.TimeStamp, scheduleMessage.getTimeStamp());
+        long row = database.insertWithOnConflict(ScheduleMessages.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
+        Log.d(TAG, "schedulingMessage: " + row);
     }
 
+    public List<ScheduleMessage> listOfScheduleMessage() {
+     List<ScheduleMessage> scheduleMessages=new ArrayList<>();
+        SQLiteDatabase schedulemessageData = this.getReadableDatabase();
+        String query = "SELECT * FROM " + ScheduleMessages.TABLE_NAME ;
+        Cursor cursor = schedulemessageData.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+          ScheduleMessage message=new ScheduleMessage();
+            String ReceiverID = cursor.getString(cursor.getColumnIndex(ScheduleMessages.ReceiverID));
+            String SenderID = cursor.getString(cursor.getColumnIndex(ScheduleMessages.SenderID));
+            String MessageID = cursor.getString(cursor.getColumnIndex(ScheduleMessages.MessageID));
+            String MessageBody = cursor.getString(cursor.getColumnIndex(ScheduleMessages.MessageBody));
+            String TimeStamp = cursor.getString(cursor.getColumnIndex(ScheduleMessages.TimeStamp));
+            String SenderName = cursor.getString(cursor.getColumnIndex(ScheduleMessages.SenderName));
+            String ReceiverName = cursor.getString(cursor.getColumnIndex(ScheduleMessages.ReceiverName));
+
+message.setSenderID(SenderID);
+message.setReceiverID(ReceiverID);
+message.setMessageID(MessageID);
+message.setMessageBody(MessageBody);
+message.setTimeStamp(TimeStamp);
+message.setSenderName(SenderName);
+message.setReceiverName(ReceiverName);
+
+            scheduleMessages.add(message);
+
+        }
+        cursor.close();
+     return scheduleMessages;
+    }
+
+    public void deleteScheduledMessage(String messageID){
+        Log.d(TAG, "deleteScheduledMessage: "+messageID);
+        SQLiteDatabase schedulemessageData = this.getReadableDatabase();
+        schedulemessageData.execSQL(" DELETE FROM " +ScheduleMessages.TABLE_NAME+ " WHERE "+ScheduleMessages.MessageID+ "=\"" + messageID + "\";" );
+
+      /*  List<ScheduleMessage> updatescheduleMessages=new ArrayList<>();
+        SQLiteDatabase database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + ScheduleMessages.TABLE_NAME ;
+        Cursor cursor = database.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            ScheduleMessage message=new ScheduleMessage();
+            String ReceiverID = cursor.getString(cursor.getColumnIndex(ScheduleMessages.ReceiverID));
+            String SenderID = cursor.getString(cursor.getColumnIndex(ScheduleMessages.SenderID));
+            String MessageID = cursor.getString(cursor.getColumnIndex(ScheduleMessages.MessageID));
+            String MessageBody = cursor.getString(cursor.getColumnIndex(ScheduleMessages.MessageBody));
+            String TimeStamp = cursor.getString(cursor.getColumnIndex(ScheduleMessages.TimeStamp));
+            String SenderName = cursor.getString(cursor.getColumnIndex(ScheduleMessages.SenderName));
+            String ReceiverName = cursor.getString(cursor.getColumnIndex(ScheduleMessages.ReceiverName));
+
+            message.setSenderID(SenderID);
+            message.setReceiverID(ReceiverID);
+            message.setMessageID(MessageID);
+            message.setMessageBody(MessageBody);
+            message.setTimeStamp(TimeStamp);
+            message.setSenderName(SenderName);
+            message.setReceiverName(ReceiverName);
+
+            updatescheduleMessages.add(message);
+
+        }*/
+        Intent intent=new Intent(THIS_BROADCAST_FOR_NOTIFY_THE_ADAPTER);
+        intent.putExtra("Notify","successful");
+        context.sendBroadcast(intent);
+    }
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         // If you need to add a column
-        Log.d(TAG, "onUpgrade: "+oldVersion);
        /* if (newVersion > oldVersion) {
             sqLiteDatabase.execSQL( "ALTER TABLE " + Messages.TABLE_NAME + " ADD COLUMN " + Messages.Delivery_Status_IS + " TEXT");
         }*/
-}
+    }
 
 }

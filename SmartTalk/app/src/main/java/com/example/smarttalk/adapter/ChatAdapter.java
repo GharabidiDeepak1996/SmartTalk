@@ -32,9 +32,8 @@ import static com.example.smarttalk.adapter.ContactAdapter.drawableToBitmap;
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
     Context mcontext;
     List<Chat> mchat;
-    String s;
+    private String s;
 
-    private static final String TAG = "ChatAdapter";
     public ChatAdapter(Context context, List<Chat> nchat) {
         mcontext=context;
         mchat=nchat;
@@ -52,7 +51,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         final Chat chat = mchat.get( position );
-        Log.d( TAG, "onBindViewHolder123: " +position );
 
         holder.Name.setText( chat.user.getFirstname() + "  " + (chat.user.getLastname()) );
         holder.Body.setText( chat.message.getBody() );
@@ -75,7 +73,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
                 .load(chat.user.getProfileImageURI())
                 .placeholder(d)
                 .into(holder.profileImage);
-        Log.d(TAG, "onBindViewHolder: "+chat.user.getStatus());
         if(chat.user.getStatus()!=null && chat.user.getStatus().equals("online")) {
             holder.status.setImageResource(R.color.online);
         }else{
@@ -96,7 +93,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
     }
 
     public void updateChatList(Chat chat, int indexToRemove, boolean isAlreaduExits) {
-        Log.d( TAG, "isAlreaduExits: "+isAlreaduExits );
         if(isAlreaduExits){
             mchat.remove( indexToRemove);
         }

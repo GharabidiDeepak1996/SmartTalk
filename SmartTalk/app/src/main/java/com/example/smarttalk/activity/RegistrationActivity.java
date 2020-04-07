@@ -24,7 +24,6 @@ import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConsta
 
 
 public class RegistrationActivity extends AppCompatActivity {
-    private static final String TAG = "RegistrationActivity";
 
     User modelclass;
     String mobilenumber;

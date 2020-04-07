@@ -44,7 +44,6 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
-    private static final String TAG = "ContactAdapter";
     private Context mcontext;
     private List<User> contacts;
     private String s;
@@ -52,7 +51,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     public ContactAdapter(Context context, List<User> contactmodel) {
         mcontext = context;
         contacts = contactmodel;
-        Log.d(TAG, "context12: " + contactmodel);
     }
 
 
@@ -72,59 +70,58 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         // final User uploadCurrent = users.get( position );  //getter & Setter
         final User muser = contacts.get(position);
 
-if(muser.getFirstname()==null){
-    Log.d(TAG, "contactadaper12: " + muser.getMobilenumber());
+        if (muser.getFirstname() == null) {
 
-}else {
-        holder.listTextView.get(0).setText(muser.getFirstname().concat(muser.getLastname()));
-        holder.listTextView.get(1).setText(muser.getMobilenumber());
-
-        //color generator
-        ColorGenerator generator = ColorGenerator.MATERIAL;    //color generator
-        String x = muser.getFirstname();
-        String[] myName = x.split(" ");
-        for (String value : myName) {
-            s = value;
-
-            //https://github.com/amulyakhare/TextDrawable
-            TextDrawable drawable2 = TextDrawable.builder()
-                    .buildRound(String.valueOf(s.charAt(0)), generator.getRandomColor());
-
-            Drawable d = new BitmapDrawable(drawableToBitmap(drawable2));
-//image holder
-            Glide.with(mcontext)
-                    .load(muser.getProfileImageURI())
-                    .placeholder(d)
-                    .into(holder.image);
-        }
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(mcontext, MessageActivity.class);
-                intent.putExtra("ReceiverUserID", muser.getUserId());
-                intent.putExtra("number", muser.getMobilenumber());
-                intent.putExtra("name", muser.getFirstname() + " " + muser.getLastname());
-                intent.putExtra("imageView", muser.getProfileImageURI());
-                mcontext.startActivity(intent);
-
-
-            }
-        });
-
-
-        if (muser.getStatus() != null && muser.getStatus().equals("online")) {
-            holder.status.setImageResource(R.color.online);
         } else {
-            holder.status.setImageResource(R.color.offline);
+            holder.listTextView.get(0).setText(muser.getFirstname().concat(muser.getLastname()));
+            holder.listTextView.get(1).setText(muser.getMobilenumber());
+
+            //color generator
+            ColorGenerator generator = ColorGenerator.MATERIAL;    //color generator
+            String x = muser.getFirstname();
+            String[] myName = x.split(" ");
+            for (String value : myName) {
+                s = value;
+
+                //https://github.com/amulyakhare/TextDrawable
+                TextDrawable drawable2 = TextDrawable.builder()
+                        .buildRound(String.valueOf(s.charAt(0)), generator.getRandomColor());
+
+                Drawable d = new BitmapDrawable(drawableToBitmap(drawable2));
+//image holder
+                Glide.with(mcontext)
+                        .load(muser.getProfileImageURI())
+                        .placeholder(d)
+                        .into(holder.image);
+            }
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Intent intent = new Intent(mcontext, MessageActivity.class);
+                    intent.putExtra("ReceiverUserID", muser.getUserId());
+                    intent.putExtra("number", muser.getMobilenumber());
+                    intent.putExtra("name", muser.getFirstname() + " " + muser.getLastname());
+                    intent.putExtra("imageView", muser.getProfileImageURI());
+                    mcontext.startActivity(intent);
+
+
+                }
+            });
+
+
+            if (muser.getStatus() != null && muser.getStatus().equals("online")) {
+                holder.status.setImageResource(R.color.online);
+            } else {
+                holder.status.setImageResource(R.color.offline);
+            }
         }
     }
-        Log.d(TAG, "onBindViewHolder12: "+position);
-    }
+
     //converter is required for circleimageview does not support the textdrawable to drawable
-    public static Bitmap drawableToBitmap (Drawable drawable) {
+    public static Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable)drawable).getBitmap();
+            return ((BitmapDrawable) drawable).getBitmap();
         }
 
 
@@ -140,6 +137,7 @@ if(muser.getFirstname()==null){
 
         return bitmap;
     }
+
     @Override
     public int getItemCount() {
 

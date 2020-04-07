@@ -25,10 +25,10 @@
         android:label="@string/SmartTalk"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Schedule.MessageSchedule"></activity>
-        <activity android:name=".Schedule.CreateSchedule" />
-        <activity android:name=".activity.MessageActivity" />
+        <activity android:name=".schedule.activity.CreateSchedule"/>
+        <activity android:name=".schedule.activity.MessageSchedule" />
         <activity android:name=".activity.RegistrationActivity" />
+        <activity android:name=".activity.MessageActivity" />
         <activity android:name=".activity.AuthenticationActivity" />
         <activity android:name=".activity.GetStartedActivity" />
         <activity android:name=".activity.HomeActivity" />
@@ -49,7 +49,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".Schedule.MyBroadcastReceiver" />
+        <receiver android:name=".schedule.services.MyBroadcastReceiver" />
     </application>
 
 </manifest>

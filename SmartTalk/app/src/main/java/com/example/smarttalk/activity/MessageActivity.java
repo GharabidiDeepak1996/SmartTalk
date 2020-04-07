@@ -65,24 +65,16 @@ import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConsta
 
 public class MessageActivity extends AppCompatActivity {
     private static final String TAG = "MessageActivity";
-
-
-    @BindView(R.id.toolbar)
-    Toolbar mtoolbar;
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
-    @BindView(R.id.Emessage)
-    EditText text_send;
-    @BindView(R.id.profile_name)
-    TextView profileName;
-    @BindView(R.id.status)
-    TextView textViewStatus;
-    @BindView(R.id.Image)
-    ImageView imageView;
+    @BindView(R.id.toolbar) Toolbar mtoolbar;
+    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.Emessage) EditText text_send;
+    @BindView(R.id.profile_name) TextView profileName;
+    @BindView(R.id.status) TextView textViewStatus;
+    @BindView(R.id.Image) ImageView imageView;
     @BindView(R.id.floating_button)
     FloatingActionButton floatingActionButton;
     String firstFourChars = "";
-   public String ReceiverUserID, SenderID, Mobileno, Name, MessageID, timeStamp,profileImage,status,typing,number;
+    public String ReceiverUserID, SenderID, Mobileno, Name, MessageID, timeStamp, profileImage, status, typing, number;
     MessageAdapter messageAdapter;
     Context mcontext;
     List<Message> message1;
@@ -91,20 +83,20 @@ public class MessageActivity extends AppCompatActivity {
     public static final String THIS_BROADCAST = "this is my broadcast";
     public static final String UPDATE_MESSAGE_STATUS_BRODCAST = "update message status broadcast";
     public static final String MESSAGEID_STATUS_UPDATE = "messageID status update";
-    public static final String STATUS_CHECKER="status checker";
-    public static final String IS_TYPING="typing";
+    public static final String STATUS_CHECKER = "status checker";
+    public static final String IS_TYPING = "typing";
     //AutoUpdate Internet Status.
     private NetworkChangeReceiver receiver;
     private boolean isConnected = false;
     public boolean isTyping = false;
-   private Timer timer = new Timer();
-   private final long DELAY = 3000; // milliseconds
+    private Timer timer = new Timer();
+    private final long DELAY = 3000; // milliseconds
     List<User> data;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
-
         ButterKnife.bind(this);
 
         //conversion id Broadcast Receiver
@@ -135,16 +127,9 @@ public class MessageActivity extends AppCompatActivity {
         //receiving from myrecycleradapter.
         Intent intent = getIntent();
         ReceiverUserID = intent.getStringExtra("ReceiverUserID");
-        if(ReceiverUserID!=null){
-            ReceiverUserID = intent.getStringExtra("ReceiverUserID");
-        }else {
-            ReceiverUserID= intent.getStringExtra("hisUID");
-        }
-        Log.d(TAG, "onCreate562: "+ReceiverUserID+"  2."+ReceiverUserID);
         Mobileno = intent.getStringExtra("number");
         Name = intent.getStringExtra("name");
-        profileImage=intent.getStringExtra("imageView");
-        Log.d(TAG, "onCreate: "+profileImage);
+        profileImage = intent.getStringExtra("imageView");
         profileName.setText(Name);
 
         Glide.with(this)
@@ -157,95 +142,94 @@ public class MessageActivity extends AppCompatActivity {
                 ReceiverUserID = ReceiverUserID.replace("==", "");
             }
         } catch (Exception e) {
-            Log.d(TAG, "onCreate: " + e);
+
         }
-         preferences = getSharedPreferences(SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE);
+        preferences = getSharedPreferences(SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE);
         SenderID = preferences.getString(LOOGED_IN_USER_ID, "");
 
         try {
 
-            Log.d(TAG, "onCreate456: "+ReceiverUserID);
             databaseHelper = new DatabaseHelper(this);
             message1 = new ArrayList<>();
             message1 = databaseHelper.getConversionID(ReceiverUserID);
             messageAdapter = new MessageAdapter(MessageActivity.this, message1);
             recyclerView.setAdapter(messageAdapter);
-//smooth scrolling from bottom when new message insert
-            Log.d(TAG, "onCreate132: "+messageAdapter.getItemCount()+"  "+(messageAdapter.getItemCount()-1));
+
+             //smooth scrolling from bottom when new message insert
             messageAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
                 @Override
                 public void onItemRangeInserted(int positionStart, int itemCount) {
                     super.onItemRangeInserted(positionStart, itemCount);
-                    linearLayoutManager.smoothScrollToPosition(recyclerView,null,messageAdapter.getItemCount()-1);
+                    linearLayoutManager.smoothScrollToPosition(recyclerView, null, messageAdapter.getItemCount() - 1);
 
                 }
             });
-        }catch (Exception ignored){
-            Log.d(TAG, "onCreate: "+ignored);
+        } catch (Exception ignored) {
+
         }
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if(dx==0 && dy==0){
-                   floatingActionButton.hide();
-                }else if(dy<0 ){
+                if (dx == 0 && dy == 0) {
+                    floatingActionButton.hide();
+                } else if (dy < 0) {
                     floatingActionButton.show();
-                }else if(dy > 0){
+                } else if (dy > 0) {
                     floatingActionButton.hide();
                 }
 
-             floatingActionButton.setOnClickListener(new View.OnClickListener() {
-                 @Override
-                 public void onClick(View v) {
-                     Log.d(TAG, "onClick: "+message1.size() + "hjfaj" +(message1.size() -1));
-                   //  recyclerView.smoothScrollToPosition(0); //scroll to top
-                     linearLayoutManager.scrollToPosition(message1.size() -1); //sroll to down
-                 }
-             });
+                floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //  recyclerView.smoothScrollToPosition(0); //scroll to top
+                        linearLayoutManager.scrollToPosition(message1.size() - 1); //sroll to down
+                    }
+                });
 
             }
         });
         text_send.addTextChangedListener(watcher);
+        floatingActionButton.hide();
     }
 
-TextWatcher watcher=new TextWatcher() {
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    TextWatcher watcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-    }
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-    }
-    @Override
-    public void afterTextChanged(Editable s) {
-        if (s.toString().trim().length() == 0) {
-            checkTypingStatus("noOne");
-        } else {
-            SharedPreferences sharedPreferences = getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-            String number = sharedPreferences.getString(LOGGED_IN_USER_CONTACT_NUMBER, null);
-            checkTypingStatus(number+" "+s);
         }
 
-        if(!isTyping) {
-            Log.d(TAG, "afterTextChanged: "+"typing");
-            // Send notification for start typing event
-            isTyping = true;
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
         }
-        timer.cancel();
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-                           @Override
-                           public void run() {
-                               isTyping = false;
-                               Log.d(TAG, "afterTextChanged: "+"stopped typing");
-                           }
-                       }, DELAY
-        );
-    }
-};
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (s.toString().trim().length() == 0) {
+                checkTypingStatus("noOne");
+            } else {
+                String number = preferences.getString(LOGGED_IN_USER_CONTACT_NUMBER, null);
+                checkTypingStatus(number + " " + s);
+            }
+
+            if (!isTyping) {
+                // Send notification for start typing event
+                isTyping = true;
+            }
+            timer.cancel();
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                               @Override
+                               public void run() {
+                                   isTyping = false;
+                                   // Send notification for stopped typing event
+                               }
+                           }, DELAY
+            );
+        }
+    };
 
 
     private void setupToolbar() {
@@ -272,29 +256,29 @@ TextWatcher watcher=new TextWatcher() {
 
             sendMessage(SenderID, ReceiverUserID, msg); //send to retrofit method
             senderMessage(SenderID, ReceiverUserID, MessageID, msg, timeStamp, MESSAGE_PENDING); //send to database
-            Log.d(TAG, "recent_message_id_onSend: "+MessageID);
 
         } else {
             Toast.makeText(MessageActivity.this, "You can't send empty message", Toast.LENGTH_SHORT).show();
         }
         //"" this indicate the black
         text_send.setText("");
-        Log.d(TAG, "size: "+message1.size());
     }
 
 
     //This for sender side.
     private void sendMessage(String SenderId, final String ReceiverId, String messageBody) {
+        String name = preferences.getString(LOGGED_IN_USER_NAME, null);
         Retrofit retrofit = BaseApplication.getRetrofitInstance();
         FCMAPI api = retrofit.create(FCMAPI.class);
-//modelcLass
+
+       //modelcLass
         Data data = new Data();
         data.SenderID = SenderId;
         data.ReceiverID = ReceiverId;
         data.Body = messageBody;
         data.MessageID = MessageID;
         data.TimeStamp = timeStamp;
-        data.Name = Name;
+        data.Name = name;
 
         MessageEntity messageEntity = new MessageEntity();
         messageEntity.data = data;
@@ -302,18 +286,14 @@ TextWatcher watcher=new TextWatcher() {
         api.sendMessage(messageEntity).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                Log.d(TAG, "onResponse: " + response.code());
                 if (response.code() == 200) {
-                    Log.d(TAG, "sendMessage_receiver: "+ReceiverUserID+" to "+ReceiverId);
-
-                    //Log.d( TAG, "onResponse: MessageEntity send successfully" );
-                   // Log.d(TAG, "onResponse: ");
+                    Log.d(TAG, "onResponse: "+"on");
                     databaseHelper.updateMessagestatus(MESSAGE_SUCCESSFULL_SENDED, MessageID);
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                Log.d(TAG, "onFailure: "+"off");
                 databaseHelper.Pendingmessagesupdate();
 
             }
@@ -330,7 +310,6 @@ TextWatcher watcher=new TextWatcher() {
 
             //Get message data from database using messageId
             DatabaseHelper handler = new DatabaseHelper(context);
-            Log.d(TAG, "context158: " + context);
             Message message = handler.getMessageById(MessageID);
             messageAdapter.addMessageToAdapter(message);
         }
@@ -348,7 +327,7 @@ TextWatcher watcher=new TextWatcher() {
             }
         }
     };
-
+//sender Side
     public void senderMessage(String SenderID, String ReceiverUserID, String MessageID, String msg, String timeStamp, String Pending) {
         Message message = new Message();
         message.setSenderID(SenderID);
@@ -382,7 +361,7 @@ TextWatcher watcher=new TextWatcher() {
                 MessageIDStatus = bundle.getString("Messagestatus");
 
             }
-           isNetworkAvailable(context, MessageIDStatus);
+            isNetworkAvailable(context, MessageIDStatus);
         }
 
         public void isNetworkAvailable(Context context, String messageID) {
@@ -397,18 +376,16 @@ TextWatcher watcher=new TextWatcher() {
                         if (info[i].getState() == NetworkInfo.State.CONNECTED) {
                             if (!isConnected) {
 
-                                if(preferences.contains(PENDING_MESSAGE_SENDTO_DATABASE)){
+                                if (preferences.contains(PENDING_MESSAGE_SENDTO_DATABASE)) {
                                     String result = preferences.getString(AppConstant.SharedPreferenceConstant.PENDING_MESSAGE_SENDTO_DATABASE, null);
                                     Gson gson = new Gson();
                                     Message[] favoriteItems = gson.fromJson(result, Message[].class);
                                     message1 = Arrays.asList(favoriteItems);
-                                    Log.d(TAG, "onCreate+Messageid: "+message1);
-                                    for(Message data:message1) {
-                                        Log.d(TAG, "isNetworkAvailableb: "+data.getMessageID());
-                                        databaseHelper.updateMessagestatus(MESSAGE_SUCCESSFULL_SENDED,data.getMessageID() );
+                                    for (Message data : message1) {
+                                        databaseHelper.updateMessagestatus(MESSAGE_SUCCESSFULL_SENDED, data.getMessageID());
                                     }
                                 }
-                               databaseHelper.updateMessagestatus(MESSAGE_SUCCESSFULL_SENDED, messageID);
+                                databaseHelper.updateMessagestatus(MESSAGE_SUCCESSFULL_SENDED, messageID);
 
                             }
                             return;
@@ -420,8 +397,9 @@ TextWatcher watcher=new TextWatcher() {
             isConnected = false;
         }
     }
+
     //contactFragment
-    BroadcastReceiver statusChecker=new BroadcastReceiver() {
+    BroadcastReceiver statusChecker = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             number = intent.getStringExtra("number");
@@ -430,46 +408,44 @@ TextWatcher watcher=new TextWatcher() {
                 status = intent.getStringExtra("statuscheck");
                 typing = intent.getStringExtra("isTyping");
 
-                if(typing.length() > 13){
+                if (typing.length() > 13) {
                     firstFourChars = typing.substring(0, 13);
-                }else{
-                    firstFourChars=typing;
+                } else {
+                    firstFourChars = typing;
                 }
 
-               if(firstFourChars.equals(number)){
-                   textViewStatus.setText("typing...");
-               }else{
-                   textViewStatus.setText(status);
-               }
+                if (firstFourChars.equals(number)) {
+                    textViewStatus.setText("typing...");
+                } else {
+                    textViewStatus.setText(status);
+                }
             }
 
         }
     };
 
-public void checkTypingStatus(String typing){
-    SharedPreferences sharedPreferences =this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-    String base64id=sharedPreferences.getString(LOOGED_IN_USER_ID,null);
-    FirebaseDatabase database= FirebaseDatabase.getInstance();
-    assert base64id != null;
-    DatabaseReference myRef =database.getReference("User").child(base64id.concat("=="));
-
-    HashMap<String,Object> hashMap=new HashMap<>();
-    hashMap.put("isTyping",typing);
-    myRef.updateChildren(hashMap);
-}
-    public void status(String status){
-        SharedPreferences sharedPreferences =this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        String base64id=sharedPreferences.getString(LOOGED_IN_USER_ID,null);
-        FirebaseDatabase database= FirebaseDatabase.getInstance();
+    public void checkTypingStatus(String typing) {
+        String base64id = preferences.getString(LOOGED_IN_USER_ID, null);
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
         assert base64id != null;
-        DatabaseReference myRef =database.getReference("User").child(base64id.concat("=="));
+        DatabaseReference myRef = database.getReference("User").child(base64id.concat("=="));
 
-        Log.d(TAG, "status: "+status + myRef);
-
-        HashMap<String,Object> hashMap=new HashMap<>();
-        hashMap.put("status",status);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("isTyping", typing);
         myRef.updateChildren(hashMap);
     }
+
+    public void status(String status) {
+        String base64id = preferences.getString(LOOGED_IN_USER_ID, null);
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        assert base64id != null;
+        DatabaseReference myRef = database.getReference("User").child(base64id.concat("=="));
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        myRef.updateChildren(hashMap);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -480,10 +456,11 @@ public void checkTypingStatus(String typing){
     protected void onPause() {
         super.onPause();
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
-        String  timeStamp1 = sdf.format(new Date());
-        status("Last Seen :"+timeStamp1);
+        String timeStamp1 = sdf.format(new Date());
+        status("Last Seen :" + timeStamp1);
         checkTypingStatus("noOne");
     }
+
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
