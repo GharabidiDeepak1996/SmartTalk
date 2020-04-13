@@ -27,6 +27,7 @@ import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.example.smarttalk.fragment.ChatsFragment.THIS_BROADCAST_FOR_CHAT_SEARCHBAR;
+import static com.example.smarttalk.fragment.ChatsFragment.THIS_BROADCAST_FOR_UPDATE_CURRENT_STATUS;
 import static com.example.smarttalk.fragment.ContactsFragment.THIS_BROADCAST_FOR_CONTACT_SEARCHBAR;
 import static com.example.smarttalk.schedule.activity.MessageSchedule.THIS_BROADCAST_FOR_NOTIFY_THE_ADAPTER;
 
@@ -194,8 +195,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(Contacts.PROFILE_IMAGE, profileImages);
         values.put(Contacts.status, status);
-        ChatsFragment chat = new ChatsFragment();
         db.update(Contacts.TABLE_NAME, values, "user_mobile = ?", new String[]{number});
+
+        Intent intent=new Intent(THIS_BROADCAST_FOR_UPDATE_CURRENT_STATUS);
+        intent.putExtra("statusupdate","succesful");
+        context.sendBroadcast(intent);
     }
 
     //this for scheduling messages.
@@ -334,6 +338,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             mUser.setFirstname(cursor.getString(cursor.getColumnIndex(Contacts.FIRST_NAME)));
             mUser.setLastname(cursor.getString(cursor.getColumnIndex(Contacts.LAST_NAME)));
             mUser.setUserId(cursor.getString(cursor.getColumnIndex(Contacts.USER_ID)));
+            mUser.setMobilenumber(cursor.getString(cursor.getColumnIndex(Contacts.MOBILE_NUMBER)));
             mUser.setProfileImageURI(cursor.getString(cursor.getColumnIndex(Contacts.PROFILE_IMAGE)));
             mUser.setStatus(cursor.getString(cursor.getColumnIndex(Contacts.status)));
             chat.user = mUser;
@@ -519,31 +524,6 @@ message.setReceiverName(ReceiverName);
         SQLiteDatabase schedulemessageData = this.getReadableDatabase();
         schedulemessageData.execSQL(" DELETE FROM " +ScheduleMessages.TABLE_NAME+ " WHERE "+ScheduleMessages.MessageID+ "=\"" + messageID + "\";" );
 
-      /*  List<ScheduleMessage> updatescheduleMessages=new ArrayList<>();
-        SQLiteDatabase database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + ScheduleMessages.TABLE_NAME ;
-        Cursor cursor = database.rawQuery(query, null);
-        while (cursor.moveToNext()) {
-            ScheduleMessage message=new ScheduleMessage();
-            String ReceiverID = cursor.getString(cursor.getColumnIndex(ScheduleMessages.ReceiverID));
-            String SenderID = cursor.getString(cursor.getColumnIndex(ScheduleMessages.SenderID));
-            String MessageID = cursor.getString(cursor.getColumnIndex(ScheduleMessages.MessageID));
-            String MessageBody = cursor.getString(cursor.getColumnIndex(ScheduleMessages.MessageBody));
-            String TimeStamp = cursor.getString(cursor.getColumnIndex(ScheduleMessages.TimeStamp));
-            String SenderName = cursor.getString(cursor.getColumnIndex(ScheduleMessages.SenderName));
-            String ReceiverName = cursor.getString(cursor.getColumnIndex(ScheduleMessages.ReceiverName));
-
-            message.setSenderID(SenderID);
-            message.setReceiverID(ReceiverID);
-            message.setMessageID(MessageID);
-            message.setMessageBody(MessageBody);
-            message.setTimeStamp(TimeStamp);
-            message.setSenderName(SenderName);
-            message.setReceiverName(ReceiverName);
-
-            updatescheduleMessages.add(message);
-
-        }*/
         Intent intent=new Intent(THIS_BROADCAST_FOR_NOTIFY_THE_ADAPTER);
         intent.putExtra("Notify","successful");
         context.sendBroadcast(intent);

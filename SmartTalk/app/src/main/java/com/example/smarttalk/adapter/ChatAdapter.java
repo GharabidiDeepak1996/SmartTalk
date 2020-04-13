@@ -33,6 +33,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
     Context mcontext;
     List<Chat> mchat;
     private String s;
+    private static final String TAG = "ChatAdapter";
 
     public ChatAdapter(Context context, List<Chat> nchat) {
         mcontext=context;
@@ -56,7 +57,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
         holder.Body.setText( chat.message.getBody() );
         holder.Timestamp.setText( chat.message.getTimeStamp() );
 
-
+        Log.d(TAG, "onBindViewHolder: "+chat.user.getFirstname() +"2.-->"+chat.user.getMobilenumber());
         //color generator
         ColorGenerator generator=ColorGenerator.MATERIAL;    //color generator
         String x=chat.user.getFirstname();
@@ -106,6 +107,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
         notifyDataSetChanged();
     }
 
+    public void updateStatus(List<Chat> chat){
+        mchat=chat;
+        notifyDataSetChanged();
+    }
     @Override
     public int getItemCount() {
         return mchat.size();

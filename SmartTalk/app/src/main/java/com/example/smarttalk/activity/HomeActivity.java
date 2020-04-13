@@ -131,6 +131,8 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
                 return false;
             }
         });
+
+
     }
 
     BroadcastReceiver broadcastReceiverForprofileImage = new BroadcastReceiver() {
@@ -247,7 +249,7 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
     @Override
     protected void onPause() {
         super.onPause();
-        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a MMMM dd, yyyy");
         String timeStamp1 = sdf.format(new Date());
         status("Last Seen :" + timeStamp1);
     }

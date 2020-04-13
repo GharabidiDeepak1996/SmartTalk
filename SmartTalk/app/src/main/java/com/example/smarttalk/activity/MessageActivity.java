@@ -37,9 +37,13 @@ import com.example.smarttalk.retrofit.FCMAPI;
 import com.example.smarttalk.retrofit.MessageEntity;
 import com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant;
 import com.example.smarttalk.modelclass.Message;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
@@ -55,6 +59,7 @@ import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -70,7 +75,7 @@ public class MessageActivity extends AppCompatActivity {
     @BindView(R.id.Emessage) EditText text_send;
     @BindView(R.id.profile_name) TextView profileName;
     @BindView(R.id.status) TextView textViewStatus;
-    @BindView(R.id.Image) ImageView imageView;
+    @BindView(R.id.Image) CircleImageView imageView;
     @BindView(R.id.floating_button)
     FloatingActionButton floatingActionButton;
     String firstFourChars = "";
@@ -99,6 +104,16 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
 
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if(task.isSuccessful()){
+                    String token=task.getResult().getToken();
+                    Log.d(TAG, "onComplete485: "+token);
+                }
+
+            }
+        });
         //conversion id Broadcast Receiver
         IntentFilter intentFilter = new IntentFilter(THIS_BROADCAST);
         registerReceiver(broadcastReceiver, intentFilter);
@@ -131,6 +146,7 @@ public class MessageActivity extends AppCompatActivity {
         Name = intent.getStringExtra("name");
         profileImage = intent.getStringExtra("imageView");
         profileName.setText(Name);
+        Log.d(TAG, "onCreate58: "+ReceiverUserID);
 
         Glide.with(this)
                 .load(profileImage)
@@ -192,6 +208,7 @@ public class MessageActivity extends AppCompatActivity {
         });
         text_send.addTextChangedListener(watcher);
         floatingActionButton.hide();
+
     }
 
     TextWatcher watcher = new TextWatcher() {
@@ -242,7 +259,7 @@ public class MessageActivity extends AppCompatActivity {
     public void sendMessage(View view) {
         MessageID = Utils.generateUniqueMessageId();
         //scrollView
-        recyclerView.smoothScrollToPosition(text_send.getBottom());
+     //   recyclerView.smoothScrollToPosition(text_send.getBottom());
         //Timestamp.
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
         timeStamp = sdf.format(new Date());
@@ -268,6 +285,9 @@ public class MessageActivity extends AppCompatActivity {
     //This for sender side.
     private void sendMessage(String SenderId, final String ReceiverId, String messageBody) {
         String name = preferences.getString(LOGGED_IN_USER_NAME, null);
+        String url = preferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
+        String number=preferences.getString(LOGGED_IN_USER_CONTACT_NUMBER,null);
+
         Retrofit retrofit = BaseApplication.getRetrofitInstance();
         FCMAPI api = retrofit.create(FCMAPI.class);
 
@@ -278,11 +298,18 @@ public class MessageActivity extends AppCompatActivity {
         data.Body = messageBody;
         data.MessageID = MessageID;
         data.TimeStamp = timeStamp;
-        data.Name = name;
+        data.SenderName = name;
+        data.SenderImage=url;
+        data.SenderMobileNumber=number;
 
+       /* List<String> registrationTokens = Arrays.asList(
+                ReceiverUserID,
+                // ...
+                "KzkxNzk3NzM5MDUyNg"
+        );*/
         MessageEntity messageEntity = new MessageEntity();
         messageEntity.data = data;
-        messageEntity.to = "/topics/" + ReceiverUserID;
+        messageEntity.to = "/topics/" + ReceiverUserID ;
         api.sendMessage(messageEntity).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
@@ -402,6 +429,7 @@ public class MessageActivity extends AppCompatActivity {
     BroadcastReceiver statusChecker = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceiveStatusChecker: ");
             number = intent.getStringExtra("number");
             typing = intent.getStringExtra("isTyping");
             if (number.equals(Mobileno)) {
@@ -455,7 +483,7 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a  MMMM dd, yyyy");
         String timeStamp1 = sdf.format(new Date());
         status("Last Seen :" + timeStamp1);
         checkTypingStatus("noOne");

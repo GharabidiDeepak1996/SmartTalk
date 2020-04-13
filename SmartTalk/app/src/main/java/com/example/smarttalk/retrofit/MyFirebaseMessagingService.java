@@ -5,7 +5,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -16,17 +19,24 @@ import com.example.smarttalk.activity.MessageActivity;
 import com.example.smarttalk.R;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
 import com.example.smarttalk.modelclass.Message;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONObject;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Random;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMessagingServ";
 
-    public String MessaageBody,Title,sernderID;
+    public String MessaageBody,senderName,sernderID,senderImageURL,senderMobilenumber;
+    Bitmap bitmap=null;
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived( remoteMessage );
@@ -36,8 +46,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             //Receiver  receive the message.
             JSONObject jsonObject = new JSONObject( remoteMessage.getData() );
             MessaageBody=jsonObject.getString( "Body" ) ;
-            Title=jsonObject.getString( "Name" );
+            senderName=jsonObject.getString( "SenderName" );
             sernderID=jsonObject.getString( "SenderID" );
+            senderImageURL=jsonObject.getString( "SenderImage" );
+            senderMobilenumber=jsonObject.getString( "SenderMobileNumber" ) ;
 
             DatabaseHelper md = new DatabaseHelper( this );
             Message message=new Message();
@@ -52,39 +64,66 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         } catch (Exception e) {
 
         }
-        //notification channelid and its regis in contactFragment
+
+        //notification channelid and its regis in contactFragment PendingIntent.FLAG_ONE_SHOT PendingIntent.FLAG_UPDATE_CURRENT
         Intent intent = new Intent(getApplicationContext(), MessageActivity.class);
         intent.putExtra("ReceiverUserID", sernderID);
+        intent.putExtra("imageView",senderImageURL);
+        intent.putExtra("name",senderName);
+        intent.putExtra("number",senderMobilenumber);
 
+
+        Log.d(TAG, "onMessageReceived84: "+senderImageURL+" 2.-->"+senderName+"3.-->"+sernderID+"4.---->"+senderMobilenumber);
         PendingIntent pendingIntent=PendingIntent.getActivity(
                 this,
                 0,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
+         bitmap = getBitmapfromUrl(senderImageURL);
+
+
+        //text
+        NotificationCompat.BigTextStyle textStyle=new NotificationCompat.BigTextStyle();
+        textStyle.setBigContentTitle(senderName);
+
+        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,"mynotification")
-                .setContentTitle(Title)
+              .setSmallIcon( R.drawable.smarttalk)
+                .setLargeIcon(bitmap)
+                .setContentTitle(senderName)
                 .setContentText(MessaageBody)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setStyle(new NotificationCompat.BigTextStyle())
-                .setSound( RingtoneManager.getDefaultUri( RingtoneManager.TYPE_NOTIFICATION))
-                .setSmallIcon( R.mipmap.smarttalk)
+                .setStyle(textStyle)
+                .setSound(defaultSoundUri)
                 .setContentIntent( pendingIntent )
                 .setDefaults( Notification.DEFAULT_SOUND)
                 .setAutoCancel(true);
-        NotificationManager notificationManager =
+            NotificationManager notificationManager =
                 ( NotificationManager ) getSystemService( Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(notificationID, notificationBuilder.build());
 
     }
-    @Override
-    public void onNewToken(String token) {
 
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // Instance ID token to your app server.
-        //nothing.
 
+    public Bitmap getBitmapfromUrl(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(input);
+            return bitmap;
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+
+        }
     }
 }
 

@@ -3,6 +3,7 @@ package com.example.smarttalk.schedule.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.smarttalk.R;
 import com.example.smarttalk.databasehelper.DatabaseHelper;
@@ -28,6 +30,17 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import co.mobiwise.materialintro.animation.MaterialIntroListener;
+import co.mobiwise.materialintro.prefs.PreferencesManager;
+import co.mobiwise.materialintro.shape.Focus;
+import co.mobiwise.materialintro.shape.FocusGravity;
+import co.mobiwise.materialintro.shape.ShapeType;
+import co.mobiwise.materialintro.view.MaterialIntroView;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseTooltip;
+import uk.co.deanwild.materialshowcaseview.shape.Shape;
+
 public class MessageSchedule extends AppCompatActivity {
     private static final String TAG = "MessageSchedule";
     @BindView(R.id.toolbar)
@@ -37,7 +50,12 @@ public class MessageSchedule extends AppCompatActivity {
     MessageScheduleAdapter mAdapter;
     List<ScheduleMessage> mList;
     DatabaseHelper databaseHelper;
+    String messages;
+    CardView cardView;
+    boolean isSwiped=false;
     public static final String THIS_BROADCAST_FOR_NOTIFY_THE_ADAPTER="notify the adapter";
+    private static final String SHOWCASE_ID = "tooltip example";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +76,16 @@ public class MessageSchedule extends AppCompatActivity {
 
         IntentFilter intentFilter=new IntentFilter(THIS_BROADCAST_FOR_NOTIFY_THE_ADAPTER);
         registerReceiver(notifyAdapter,intentFilter);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(mList.size()>=1) {
+                        introduceFirstTime();
+                }
+
+            }
+        }, 2000);
+
     }
 
     public void toolbarsetup() {
@@ -78,19 +106,22 @@ public class MessageSchedule extends AppCompatActivity {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition();
                 final ScheduleMessage item = mAdapter.getData().get(position); //receive all data for restore
-                final String messages = mAdapter.getData().get(position).MessageID;
+                  messages = mAdapter.getData().get(position).MessageID;
 
                 //remove
                 mAdapter.removeItem(position);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        databaseHelper.deleteScheduledMessage((messages));
-                        Log.d(TAG, "run56: "+(position));
-                        //Do something after 3000ms ---> 3sec
-                    }
-                }, 3000);
+                Log.d(TAG, "run58: "+messages);
+
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "run58: "+messages);
+                            databaseHelper.deleteScheduledMessage((messages));
+                            //Do something after 3000ms ---> 3sec
+                        }
+                    }, 4000);
+
 
                 View parentLayout = findViewById(android.R.id.content);
                 Snackbar snackbar = Snackbar.make(parentLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
@@ -98,6 +129,7 @@ public class MessageSchedule extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                       //restore
+                      messages=null;
                         mAdapter.restoreItem(item, position);
                         recyclerView.scrollToPosition(position);
                     }
@@ -124,5 +156,20 @@ public class MessageSchedule extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(notifyAdapter);
+    }
+
+    public void introduceFirstTime(){
+        new MaterialIntroView.Builder(this)
+                .enableDotAnimation(true)
+                .setFocusGravity(FocusGravity.LEFT)
+                .setFocusType(Focus.MINIMUM)
+                .setDelayMillis(200)
+                .enableFadeAnimation(true)
+                .performClick(false)
+                .setInfoText(" If You want to delete the scheduled message through the swiping left side ")
+                .setTarget(recyclerView.getChildAt(0))
+                .setShape(ShapeType.RECTANGLE)
+                .setUsageId(SHOWCASE_ID) //THIS SHOULD BE UNIQUE ID
+                .show();
     }
 }

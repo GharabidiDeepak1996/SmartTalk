@@ -151,7 +151,7 @@ public class CreateSchedule extends AppCompatActivity implements View.OnClickLis
                                 txtTime.setText(hourOfDay + ":" + minute);
 
                             }else {
-                                Toast.makeText(getApplicationContext(), "current minute to be greater than 2 minute ", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Please Check selected minute is greater than current minute.   ", Toast.LENGTH_LONG).show();
                             }
                         }
                     }, mHour, mMinute, false);
@@ -186,9 +186,11 @@ public class CreateSchedule extends AppCompatActivity implements View.OnClickLis
         String timeStamp=txtTime.getText().toString()+" "+time;
 
         SharedPreferences preferences = this.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE);
-        //senderID & senderName
+        //senderID ,senderName & senderImage
         String SenderID = preferences.getString(LOOGED_IN_USER_ID, "");
         String senderName=preferences.getString(LOGGED_IN_USER_NAME,"");
+        String url = preferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
+        String senderMobileNumber=preferences.getString(AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_CONTACT_NUMBER,null);
 
 
 
@@ -202,6 +204,8 @@ public class CreateSchedule extends AppCompatActivity implements View.OnClickLis
         bundle.putString("senderName",senderName);
         bundle.putString("messageID",messageID);
         bundle.putString("timeStamp",timeStamp);
+        bundle.putString("senderimage",url);
+        bundle.putString("sendermobilenumber",senderMobileNumber);
 
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
         ScheduleMessage message=new ScheduleMessage();

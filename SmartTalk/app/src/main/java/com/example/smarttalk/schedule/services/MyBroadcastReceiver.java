@@ -51,13 +51,15 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
             String senderName = bundle.getString("senderName");
             String timeStamp = bundle.getString("timeStamp");
             messageID = bundle.getString("messageID");
+            String senderImage=bundle.getString("senderimage");
+            String senderMobileNumber=bundle.getString("sendermobilenumber");
 
 
-            sendMessage(senderID, receiverID, messageBody, timeStamp, senderName);
+            sendMessage(senderID, receiverID, messageBody, timeStamp, senderName,senderImage,senderMobileNumber);
         }
     }
 
-    private void sendMessage(String SenderId, final String ReceiverId, String messageBody, String timeStamp, String senderName) {
+    private void sendMessage(String SenderId, final String ReceiverId, String messageBody, String timeStamp, String senderName,String SenderImage,String sendermobilenumber) {
         Retrofit retrofit = BaseApplication.getRetrofitInstance();
         FCMAPI api = retrofit.create(FCMAPI.class);
 
@@ -67,7 +69,9 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
         data.Body = messageBody;
         data.MessageID = messageID;
         data.TimeStamp = timeStamp;
-        data.Name = senderName;
+        data.SenderName = senderName;
+        data.SenderImage=SenderImage;
+        data.SenderMobileNumber=sendermobilenumber;
 
         MessageEntity messageEntity = new MessageEntity();
         messageEntity.data = data;
@@ -87,7 +91,6 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                     message.setTimeStamp(timeStamp);
                     message.setDeliveryStatus(MESSAGE_SUCCESSFULL_SENDED);
                     databaseHelper.insert(message);
-
                     databaseHelper.deleteScheduledMessage(messageID);
                 }
             }
