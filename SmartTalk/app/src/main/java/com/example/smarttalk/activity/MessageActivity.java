@@ -1,26 +1,37 @@
 package com.example.smarttalk.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,14 +49,25 @@ import com.example.smarttalk.retrofit.MessageEntity;
 import com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant;
 import com.example.smarttalk.modelclass.Message;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,8 +98,8 @@ public class MessageActivity extends AppCompatActivity {
     @BindView(R.id.profile_name) TextView profileName;
     @BindView(R.id.status) TextView textViewStatus;
     @BindView(R.id.Image) CircleImageView imageView;
-    @BindView(R.id.floating_button)
-    FloatingActionButton floatingActionButton;
+    @BindView(R.id.floating_button) FloatingActionButton floatingActionButton;
+    @BindView(R.id.attach_images) ImageButton attchImages;
     String firstFourChars = "";
     public String ReceiverUserID, SenderID, Mobileno, Name, MessageID, timeStamp, profileImage, status, typing, number;
     MessageAdapter messageAdapter;
@@ -90,6 +112,7 @@ public class MessageActivity extends AppCompatActivity {
     public static final String MESSAGEID_STATUS_UPDATE = "messageID status update";
     public static final String STATUS_CHECKER = "status checker";
     public static final String IS_TYPING = "typing";
+    private static final int REQUEST_CODE  = 1;
     //AutoUpdate Internet Status.
     private NetworkChangeReceiver receiver;
     private boolean isConnected = false;
@@ -97,6 +120,7 @@ public class MessageActivity extends AppCompatActivity {
     private Timer timer = new Timer();
     private final long DELAY = 3000; // milliseconds
     List<User> data;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +176,7 @@ public class MessageActivity extends AppCompatActivity {
                 .load(profileImage)
                 .placeholder(R.mipmap.avatar)
                 .into(imageView);
+
         setupToolbar();
         try {
             if (ReceiverUserID.contains("==")) {
@@ -208,7 +233,7 @@ public class MessageActivity extends AppCompatActivity {
         });
         text_send.addTextChangedListener(watcher);
         floatingActionButton.hide();
-
+attchImages();
     }
 
     TextWatcher watcher = new TextWatcher() {
@@ -266,6 +291,7 @@ public class MessageActivity extends AppCompatActivity {
 
         String msg = text_send.getText().toString();
 
+
         if (!msg.equals("")) {
             //retrieve data from contactfragment
             //https://www.journaldev.com/9412/android-shared-preferences-example-tutorial
@@ -302,11 +328,6 @@ public class MessageActivity extends AppCompatActivity {
         data.SenderImage=url;
         data.SenderMobileNumber=number;
 
-       /* List<String> registrationTokens = Arrays.asList(
-                ReceiverUserID,
-                // ...
-                "KzkxNzk3NzM5MDUyNg"
-        );*/
         MessageEntity messageEntity = new MessageEntity();
         messageEntity.data = data;
         messageEntity.to = "/topics/" + ReceiverUserID ;
@@ -487,6 +508,74 @@ public class MessageActivity extends AppCompatActivity {
         String timeStamp1 = sdf.format(new Date());
         status("Last Seen :" + timeStamp1);
         checkTypingStatus("noOne");
+    }
+
+
+    //click buttonto import image
+    public void attchImages(){
+        attchImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent gallery = new Intent(Intent.ACTION_PICK);
+                gallery.setType("image/*"); // we set type of images
+                startActivityForResult(gallery, REQUEST_CODE );
+            }
+        });
+    }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE  && resultCode == RESULT_OK && data != null && data.getData() != null) {
+           Uri uri=data.getData();
+           String  uniqueID = Utils.generateUniqueMessageId();
+            uploadImageUrl(uri,uniqueID);
+            //progress bar
+            progressDialog=new ProgressDialog(this);
+            progressDialog.setMessage("Sending Image....");
+            progressDialog.setTitle("Please Wait for 2 Sec");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.show();
+
+            Log.d(TAG, "onSuccess45: 3");
+
+        }
+    }
+    private void uploadImageUrl(Uri imageUri,String uniqID) {
+        Log.d(TAG, "uploadFile546: "+imageUri+"2.--->"+uniqID);
+        if (imageUri != null) {
+            StorageReference storage = FirebaseStorage.getInstance().getReference().child("conversion_images").child(uniqID);
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),imageUri);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data1 = baos.toByteArray();
+            //upload in firebase.
+            storage.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    storage.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+
+                            MessageID = Utils.generateUniqueMessageId();
+                            //Timestamp.
+                            SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+                            timeStamp = sdf.format(new Date());
+                            sendMessage(SenderID, ReceiverUserID, uri.toString()); //send to retrofit method
+                            senderMessage(SenderID, ReceiverUserID, MessageID, uri.toString(), timeStamp, MESSAGE_PENDING); //send to database
+
+                            progressDialog.dismiss();                        }
+                    });
+                  }
+            });
+
+        }
     }
 
     public void onDestroy() {

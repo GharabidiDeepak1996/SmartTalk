@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,8 +34,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
     Context mcontext;
     List<Chat> mchat;
     private String s;
-    private static final String TAG = "ChatAdapter";
-
+    String firstThirtyEightChars = "";
     public ChatAdapter(Context context, List<Chat> nchat) {
         mcontext=context;
         mchat=nchat;
@@ -54,10 +54,20 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
         final Chat chat = mchat.get( position );
 
         holder.Name.setText( chat.user.getFirstname() + "  " + (chat.user.getLastname()) );
-        holder.Body.setText( chat.message.getBody() );
         holder.Timestamp.setText( chat.message.getTimeStamp() );
 
-        Log.d(TAG, "onBindViewHolder: "+chat.user.getFirstname() +"2.-->"+chat.user.getMobilenumber());
+
+        if(chat.message.getBody().length()>38) {
+            firstThirtyEightChars = chat.message.getBody().substring(0, 38);
+        }
+
+        if(firstThirtyEightChars.equals("https://firebasestorage.googleapis.com")){
+            holder.Body.setText( "Photo" );
+        }else {
+            holder.Body.setText( chat.message.getBody() );
+
+        }
+
         //color generator
         ColorGenerator generator=ColorGenerator.MATERIAL;    //color generator
         String x=chat.user.getFirstname();

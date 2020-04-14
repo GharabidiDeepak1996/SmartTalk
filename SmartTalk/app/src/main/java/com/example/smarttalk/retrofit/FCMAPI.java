@@ -12,6 +12,7 @@ public interface FCMAPI {
 
     @Headers({
             "Content-Type: application/json",
+
     })
     @POST("/fcm/send")
     Call<ResponseBody> sendMessage(@Body MessageEntity messageEntity);

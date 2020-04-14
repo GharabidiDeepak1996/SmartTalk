@@ -36,6 +36,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMessagingServ";
 
     public String MessaageBody,senderName,sernderID,senderImageURL,senderMobilenumber;
+    String firstThirtyEightChars = "";
+    String messgae="";
     Bitmap bitmap=null;
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -72,8 +74,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         intent.putExtra("name",senderName);
         intent.putExtra("number",senderMobilenumber);
 
-
-        Log.d(TAG, "onMessageReceived84: "+senderImageURL+" 2.-->"+senderName+"3.-->"+sernderID+"4.---->"+senderMobilenumber);
+        Log.d(TAG, "onMessageReceived84: "+senderImageURL+" 2.-->"+senderName+"3.-->"+sernderID+"4.---->"+senderMobilenumber+"5.-->"+MessaageBody);
         PendingIntent pendingIntent=PendingIntent.getActivity(
                 this,
                 0,
@@ -81,7 +82,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 PendingIntent.FLAG_UPDATE_CURRENT);
          bitmap = getBitmapfromUrl(senderImageURL);
 
-
+       // String firebase="https://firebasestorage.googleapis.com/v0/b/smarttalk-44aa3.appspot.com/o/conversion_images%2FLXEB0148WSGJVJ7T?alt=media&token=dfa6debf-0091-4455-8d82-55e28c080dbf";
+        if(MessaageBody.length()>38) {
+            firstThirtyEightChars = MessaageBody.substring(0, 38);
+        }
+        if(firstThirtyEightChars.equals("https://firebasestorage.googleapis.com")){
+            messgae="Send You Photo......";
+        }else {
+            messgae=MessaageBody;
+        }
         //text
         NotificationCompat.BigTextStyle textStyle=new NotificationCompat.BigTextStyle();
         textStyle.setBigContentTitle(senderName);
@@ -90,10 +99,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,"mynotification")
-              .setSmallIcon( R.drawable.smarttalk)
+                 .setSmallIcon( R.mipmap.smarttalk)
                 .setLargeIcon(bitmap)
                 .setContentTitle(senderName)
-                .setContentText(MessaageBody)
+                .setContentText(messgae)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setStyle(textStyle)
                 .setSound(defaultSoundUri)

@@ -108,7 +108,8 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         List<String> list = new ArrayList<>();
         list.add("Chats");
-        list.add("Contacts");
+        list.add("Group");
+        list.add("Contacts");//
         list.add("Profile");
         TabLayoutAdapter tabLayoutAdapter = new TabLayoutAdapter(getSupportFragmentManager(), list);
         viewPager.setAdapter(tabLayoutAdapter);
@@ -116,7 +117,12 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
         //this is for searchview
-
+/*materialSearchView.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        tabLayout.setVisibility(View.GONE);
+    }
+});*/
         materialSearchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -131,7 +137,6 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
                 return false;
             }
         });
-
 
     }
 
@@ -162,7 +167,7 @@ public class HomeActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onPageSelected(int position) {
-        if (position == 2) {
+        if (position == 3) {
             // menuItem.setVisible(false);
             getSupportActionBar().hide();
         } else {

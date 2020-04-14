@@ -146,7 +146,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private void uploadFile() {
         if (imageUri != null) {
-            filepath = FirebaseStorage.getInstance().getReference().child("Profile_Imamge").child(userID);
+            filepath = FirebaseStorage.getInstance().getReference().child("Profile_Image").child(userID);
             Bitmap bitmap = null;
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(mcontext.getContentResolver(), imageUri);
