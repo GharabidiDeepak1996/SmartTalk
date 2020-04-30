@@ -13,6 +13,8 @@
 # --->MAINTAIN OWN ACCOUNT
 * Change Profile Image
 * Remove Profile Image
+* Create Schedule Messages
+* Delete Schedule Messages
 * Create Group Chat
 # --->CHAT WITH FRIENDS
 * Send Messages
