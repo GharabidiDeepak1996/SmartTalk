@@ -8,6 +8,13 @@
 * Logout
 * Firebase authentication for login and register
 # --->VIEW ALL USERS
-View all the users using the app
-View their profile image and status
-
+* View all the users using the app
+* View their profile image and status
+# --->MAINTAIN OWN ACCOUNT
+* Change Profile Image
+* Create Group Chat
+# --->CHAT WITH FRIENDS
+* Send Messages
+* Send Images
+* Last seen
+* Friend is Online or not
