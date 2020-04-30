@@ -16,6 +16,6 @@
 # --->CHAT WITH FRIENDS
 * Send Messages
 * Send Images
-* send Notification
+* Send Notification
 * Last seen
 * Friend is Online or not
