@@ -2,7 +2,7 @@
 ![grab-landing-page](https://media.giphy.com/media/XfaO0cE7JEfynXWcCJ/giphy.gif)
 
 # FEATURES
---->LOGIN , REGISTER
+#--->LOGIN , REGISTER
 Register new account
 Login with existing account
 Logout
