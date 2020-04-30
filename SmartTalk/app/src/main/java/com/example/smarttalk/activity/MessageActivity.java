@@ -89,6 +89,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant.*;
+import static com.example.smarttalk.constants.NetworkConstants.MESSAGEID_STATUS_UPDATE;
+import static com.example.smarttalk.constants.NetworkConstants.PICK_IMAGE;
+import static com.example.smarttalk.constants.NetworkConstants.STATUS_CHECKER;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST;
+import static com.example.smarttalk.constants.NetworkConstants.UPDATE_MESSAGE_STATUS_BRODCAST;
 
 public class MessageActivity extends AppCompatActivity {
     private static final String TAG = "MessageActivity";
@@ -107,19 +112,13 @@ public class MessageActivity extends AppCompatActivity {
     List<Message> message1;
     SharedPreferences preferences;
     DatabaseHelper databaseHelper;
-    public static final String THIS_BROADCAST = "this is my broadcast";
-    public static final String UPDATE_MESSAGE_STATUS_BRODCAST = "update message status broadcast";
-    public static final String MESSAGEID_STATUS_UPDATE = "messageID status update";
-    public static final String STATUS_CHECKER = "status checker";
-    public static final String IS_TYPING = "typing";
-    private static final int REQUEST_CODE  = 1;
+
     //AutoUpdate Internet Status.
     private NetworkChangeReceiver receiver;
     private boolean isConnected = false;
     public boolean isTyping = false;
     private Timer timer = new Timer();
     private final long DELAY = 3000; // milliseconds
-    List<User> data;
     ProgressDialog progressDialog;
 
     @Override
@@ -128,16 +127,7 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
 
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-            @Override
-            public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                if(task.isSuccessful()){
-                    String token=task.getResult().getToken();
-                    Log.d(TAG, "onComplete485: "+token);
-                }
 
-            }
-        });
         //conversion id Broadcast Receiver
         IntentFilter intentFilter = new IntentFilter(THIS_BROADCAST);
         registerReceiver(broadcastReceiver, intentFilter);
@@ -284,7 +274,7 @@ attchImages();
     public void sendMessage(View view) {
         MessageID = Utils.generateUniqueMessageId();
         //scrollView
-     //   recyclerView.smoothScrollToPosition(text_send.getBottom());
+       recyclerView.smoothScrollToPosition(text_send.getBottom());
         //Timestamp.
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
         timeStamp = sdf.format(new Date());
@@ -504,6 +494,8 @@ attchImages();
     @Override
     protected void onPause() {
         super.onPause();
+       //unregisterReceiver(receiver);
+
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a  MMMM dd, yyyy");
         String timeStamp1 = sdf.format(new Date());
         status("Last Seen :" + timeStamp1);
@@ -518,7 +510,7 @@ attchImages();
             public void onClick(View v) {
                 Intent gallery = new Intent(Intent.ACTION_PICK);
                 gallery.setType("image/*"); // we set type of images
-                startActivityForResult(gallery, REQUEST_CODE );
+                startActivityForResult(gallery, PICK_IMAGE );
             }
         });
     }
@@ -526,7 +518,7 @@ attchImages();
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE  && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_IMAGE  && resultCode == RESULT_OK && data != null && data.getData() != null) {
            Uri uri=data.getData();
            String  uniqueID = Utils.generateUniqueMessageId();
             uploadImageUrl(uri,uniqueID);
@@ -555,10 +547,12 @@ attchImages();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             byte[] data1 = baos.toByteArray();
-            //upload in firebase.
+            //uploadLoading image Url in firebase.
             storage.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //getImage Url from firebase
+
                     storage.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {

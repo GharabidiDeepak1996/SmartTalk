@@ -1,18 +1,24 @@
 package com.example.smarttalk.activity;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.smarttalk.R;
 import com.example.smarttalk.modelclass.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.List;
 
@@ -24,14 +30,13 @@ import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConsta
 
 
 public class RegistrationActivity extends AppCompatActivity {
-
+    private static final String TAG = "RegistrationActivity";
     User modelclass;
-    String mobilenumber;
+    String mobilenumber, token,UserID;
     DatabaseReference myRef;
     FirebaseDatabase database;
     @BindViews({R.id.FirstName,R.id.LastName} ) List<EditText> ListEditText;
 
-String UserID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +44,30 @@ String UserID;
         setContentView( R.layout.activity_registration );
         ButterKnife.bind( this );
 
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if(task.isSuccessful()){
+                     token=task.getResult().getToken();
+                    Log.d(TAG, "onComplete5698: "+token);
+
+                }
+
+            }
+        });
+
         mobilenumber=getIntent().getStringExtra( "MobileNumber" );
-        UserID=getIntent().getStringExtra( "UserID" );
+        //UserID=getIntent().getStringExtra( "UserID" );
         modelclass = new User();
     }
 
     private void getValues() {
-        modelclass.setUserId( UserID );
+        String Base64_ID = getIntent().getStringExtra( "Base64_ID" );
+        if (Base64_ID.contains( "==" )) {
+          //  user.setUserId( user.getUserId().replace( "==", "" ) );
+            modelclass.setUserId( Base64_ID.replace("==", "" ) );
+        }
+      //  modelclass.setUserId( UserID );
         String firstname=ListEditText.get( 0 ).getText().toString();
         // Create firstname a char array of given String
         char cfname[] = firstname.toCharArray();
@@ -94,6 +116,8 @@ String UserID;
                 // Convert into Lower-Case
                 clname[i] = (char)(clname[i] + 'a' - 'A');
         }
+
+
         // Convert the char array to equivalent String
         String Lastname = new String(clname);
         modelclass.setLastname( Lastname);
@@ -101,6 +125,7 @@ String UserID;
         modelclass.setProfileImageURI("Default");
         modelclass.setStatus("Default");
         modelclass.setIsTyping("Default");
+        modelclass.setRegistrationTokenID(token);
     }
 
 

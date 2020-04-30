@@ -11,6 +11,7 @@ public class User implements Serializable {
     private String ProfileImageURI;
     private String Status;
     private String isTyping;
+    private String registrationTokenID;
 
 public User(){
 
@@ -70,6 +71,14 @@ public User(){
 
     public void setMobilenumber(String mobilenumber) {
         this.mobilenumber = mobilenumber;
+    }
+
+    public String getRegistrationTokenID() {
+        return registrationTokenID;
+    }
+
+    public void setRegistrationTokenID(String registrationTokenID) {
+        this.registrationTokenID = registrationTokenID;
     }
 
     @Override

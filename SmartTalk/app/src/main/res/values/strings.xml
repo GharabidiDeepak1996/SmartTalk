@@ -18,6 +18,7 @@
     <string name="signout">Signout</string>
     <string name="search">search</string>
     <string name="to">TO :</string>
+    <string name="group_name">Group Name</string>
 
 
 </resources>

@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -59,11 +60,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
 
         if(chat.message.getBody().length()>38) {
             firstThirtyEightChars = chat.message.getBody().substring(0, 38);
+        }else{
+            firstThirtyEightChars=chat.message.getBody();
+
         }
 
         if(firstThirtyEightChars.equals("https://firebasestorage.googleapis.com")){
+            holder.imageView.setVisibility(View.VISIBLE);
             holder.Body.setText( "Photo" );
         }else {
+            holder.imageView.setVisibility(View.GONE);
             holder.Body.setText( chat.message.getBody() );
 
         }
@@ -133,6 +139,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder>  {
         @BindView( R.id.timestamp_textview )TextView Timestamp;
         @BindView( R.id.image ) CircleImageView profileImage;
         @BindView( R.id.statusChecker ) CircleImageView status;
+        @BindView(R.id.imageView) ImageView imageView;
         public viewHolder(@NonNull View itemView) {
             super( itemView );
      ButterKnife.bind( this,itemView );

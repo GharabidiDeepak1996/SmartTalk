@@ -1,16 +1,23 @@
 package com.example.smarttalk.fragment;
 
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -47,22 +54,27 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.app.Activity.RESULT_OK;
 import static com.example.smarttalk.constants.AppConstant.SharedPreferenceConstant.LOOGED_IN_USER_ID;
+import static com.example.smarttalk.constants.NetworkConstants.PICK_IMAGE;
+import static com.example.smarttalk.constants.NetworkConstants.REQUEST_CAMERA;
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
     private CircleImageView Profileimage;
     private Context mcontext;
-    private static final int PICK_IMAGE = 1;
     private String userID;
     private StorageReference filepath;
     private FirebaseAuth mAuth;
     private Uri imageUri;
     public static final String THIS_BROADCAST_FOR_PROFILE_IMAGE = "this is for profile image";
+    ProgressDialog progressDialog;
+    private static final String TAG = "ProfileFragment";
 
     //https://www.simplifiedcoding.net/firebase-storage-example/
 
@@ -87,13 +99,43 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         String number = sharedPreferences.getString(AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_CONTACT_NUMBER, null);
         TName.setText(Name);
         TNumber.setText(String.valueOf(number));
+
         Profileimage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //THIS IS FOR  PICK  FORM GALLERY
-                Intent gallery = new Intent(Intent.ACTION_PICK);
-                gallery.setType("image/*"); // we set type of images
-                startActivityForResult(gallery, PICK_IMAGE);
+                final CharSequence[] items = {"Take Photo", "Choose from Library", "Remove Photo"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Profile Photo");
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (items[item].equals("Take Photo")) {
+                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(intent, REQUEST_CAMERA);
+
+                        } else if (items[item].equals("Choose from Library")) {
+                            //THIS IS FOR  PICK  FORM GALLERY
+                            Intent gallery = new Intent(Intent.ACTION_PICK);
+                            gallery.setType("image/*"); // we set type of images
+                            startActivityForResult(gallery, PICK_IMAGE);
+                              } else if (items[item].equals("Remove Photo")) {
+
+                               Glide.with(mcontext)
+                                       .load(R.mipmap.avatar)
+                                      .into(Profileimage);
+
+                               //null image view set
+                            SharedPreferences sharedPreferences = mcontext.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(AppConstant.ImageURI.ProfileImageUri, "");
+                            editor.apply();
+
+                           dialog.dismiss(); //dismiss the dialog when an option is selected
+                        }
+                    }
+                });
+                builder.show(); //finally, show this dialog upon button click
             }
         });
         String url = sharedPreferences.getString(AppConstant.ImageURI.ProfileImageUri, null);
@@ -116,14 +158,28 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null && data.getData()!=null) {
+           // mcontext.getContentResolver().delete(data.getData(), null, null);
+
             imageUri = data.getData();
-            Profileimage.setImageURI(imageUri);
+            progressDialog=new ProgressDialog(getActivity());
+            progressDialog.setMessage("Sending Image....");
+            progressDialog.setTitle("Please Wait for 2 Sec");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.show();
+
+           // Profileimage.setImageURI(imageUri);
             uploadFile();
             //fetching the uploaded image for the firebase
             filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
                     String url = uri.toString();
+
+                    Glide.with(mcontext)
+                            .load(url)
+                            .placeholder(R.mipmap.avatar)
+                            .into(Profileimage);
+                    progressDialog.dismiss();
 
                     //put image url into SharedPreference
                     SharedPreferences sharedPreferences = mcontext.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, Context.MODE_PRIVATE);
@@ -145,6 +201,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private void uploadFile() {
+
+
         if (imageUri != null) {
             filepath = FirebaseStorage.getInstance().getReference().child("Profile_Image").child(userID);
             Bitmap bitmap = null;

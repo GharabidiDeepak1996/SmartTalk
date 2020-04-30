@@ -61,14 +61,22 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/name_textview"
                 app:layout_constraintTop_toTopOf="parent" />
-
+<ImageView
+    android:id="@+id/imageView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:visibility="gone"
+    android:src="@drawable/ic_image_black_24dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="@+id/name_textview"
+    app:layout_constraintTop_toBottomOf="@id/name_textview"
+    app:layout_constraintEnd_toStartOf="@id/body_textview"/>
             <TextView
                 android:id="@+id/body_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/image"
+                app:layout_constraintStart_toEndOf="@id/imageView"
                 app:layout_constraintTop_toBottomOf="@id/name_textview" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -28,9 +28,7 @@
             android:layout_marginTop="24dp"
             android:layout_toEndOf="@id/image_view"
             android:textSize="16dp"
-            android:text="jbds jsgf gsd kkjgjsdffsnkfks k.dbfkja"
-            android:textStyle="bold"
-            android:textColor="#000"/>
+            android:text="jbds jsgf gsd kkjgjsdffsnkfks k.dbfkja"/>
 
         <TextView
             android:id="@+id/number"
@@ -43,13 +41,15 @@
             android:text="ksjfd gdfighsd "/>
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/statusChecker"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_marginTop="55dp"
-            android:layout_marginStart="60dp" />
+            android:id="@+id/rightTik"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="45dp"
+            android:src="@drawable/item_white_check"
+            android:visibility="gone"/>
 
     </RelativeLayout>
 
-    </androidx.cardview.widget.CardView>
+</androidx.cardview.widget.CardView>
 

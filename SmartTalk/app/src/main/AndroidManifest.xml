@@ -16,16 +16,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="icon, label">
-        <activity android:name=".group.activity.SelectNewParticipants"></activity>
+        <activity android:name=".group.activity.GroupMessageActivity"/>
+        <activity android:name=".group.activity.GroupDetailsActivity" />
+        <activity android:name=".group.activity.SelectNewParticipants" />
         <activity android:name=".schedule.activity.CreateSchedule" />
         <activity android:name=".schedule.activity.MessageSchedule" />
         <activity android:name=".activity.RegistrationActivity" />
-        <activity android:name=".activity.MessageActivity"
-            android:launchMode="singleTop"/>
+        <activity android:name=".activity.MessageActivity" />
         <activity android:name=".activity.AuthenticationActivity" />
         <activity android:name=".activity.GetStartedActivity" />
-        <activity android:name=".activity.HomeActivity"
-            android:launchMode="singleTop"/>
+        <activity android:name=".activity.HomeActivity" />
         <activity android:name=".activity.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,9 +35,7 @@
         </activity>
 
         <service
-            android:name=".retrofit.MyFirebaseMessagingService"
-            android:enabled="true"
-            android:exported="true">
+            android:name=".retrofit.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

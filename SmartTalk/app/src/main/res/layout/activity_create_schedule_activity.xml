@@ -70,6 +70,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="22dp"
         android:text="date"
+        android:backgroundTint="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/textViewDate"
         app:layout_constraintTop_toBottomOf="@id/autocomplete_country" />
@@ -81,6 +82,7 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="25dp"
         android:text="time"
+        android:backgroundTint="@color/colorPrimary"
         android:layout_marginStart="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -144,6 +146,7 @@
         android:onClick="scheduledmessage"
         android:text="Set Schedule Message"
         app:cornerRadius="20dp"
+        android:backgroundTint ="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"

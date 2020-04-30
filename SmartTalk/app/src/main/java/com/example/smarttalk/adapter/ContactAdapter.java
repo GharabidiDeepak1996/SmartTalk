@@ -57,8 +57,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mcontext)
-                .inflate(R.layout.contact_card_view, parent, false);
+        View view = LayoutInflater.from(mcontext).inflate(R.layout.contact_card_view, parent, false);
         return new ViewHolder(view);
         // return new ViewHolder( LayoutInflater.from(mcontext).inflate( R.layout.card_view_activity, parent, false)); this is also one way
     }

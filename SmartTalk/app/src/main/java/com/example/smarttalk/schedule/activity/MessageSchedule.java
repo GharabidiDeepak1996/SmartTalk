@@ -41,6 +41,9 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import uk.co.deanwild.materialshowcaseview.ShowcaseTooltip;
 import uk.co.deanwild.materialshowcaseview.shape.Shape;
 
+import static com.example.smarttalk.constants.NetworkConstants.SHOWCASE_ID;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST_FOR_NOTIFY_THE_ADAPTER;
+
 public class MessageSchedule extends AppCompatActivity {
     private static final String TAG = "MessageSchedule";
     @BindView(R.id.toolbar)
@@ -53,8 +56,7 @@ public class MessageSchedule extends AppCompatActivity {
     String messages;
     CardView cardView;
     boolean isSwiped=false;
-    public static final String THIS_BROADCAST_FOR_NOTIFY_THE_ADAPTER="notify the adapter";
-    private static final String SHOWCASE_ID = "tooltip example";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,7 +168,7 @@ public class MessageSchedule extends AppCompatActivity {
                 .setDelayMillis(200)
                 .enableFadeAnimation(true)
                 .performClick(false)
-                .setInfoText(" If You want to delete the scheduled message through the swiping left side ")
+                .setInfoText("If You want to delete the scheduled message through the swiping left side ")
                 .setTarget(recyclerView.getChildAt(0))
                 .setShape(ShapeType.RECTANGLE)
                 .setUsageId(SHOWCASE_ID) //THIS SHOULD BE UNIQUE ID

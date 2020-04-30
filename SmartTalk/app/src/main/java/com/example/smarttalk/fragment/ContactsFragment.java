@@ -45,7 +45,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.smarttalk.activity.MessageActivity.STATUS_CHECKER;
+import static com.example.smarttalk.constants.NetworkConstants.STATUS_CHECKER;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST_FOR_CONTACT_SEARCHBAR;
 
 
 public class ContactsFragment extends Fragment {
@@ -57,13 +58,11 @@ public class ContactsFragment extends Fragment {
     private String mLoggedInUserContactNumber;
     private Context mContext;
     private SharedPreferences mPreference;
-    private String FirstName, LastName, MobileNumber, UserID,imageView,status,typing;
+    private String FirstName, LastName, MobileNumber, UserID,imageView,status,typing,token;
     private DatabaseHelper databaseHelper;
     private List<User> contactmodel;
     private User contact;
-
-    public static final String THIS_BROADCAST_FOR_CONTACT_SEARCHBAR = "this is for contact searchBar";
-    //private static final String TAG = "MyFirebaseMessagingServ";
+    private static final String TAG = "ContactsFragment";
 
     public ContactsFragment() {
         // Required empty public constructor
@@ -99,8 +98,8 @@ public class ContactsFragment extends Fragment {
         contactmodel = databaseHelper.display();
         mfetchAdapter = new ContactAdapter( getActivity(), contactmodel );
         recyclerView.setAdapter( mfetchAdapter );
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = firebaseDatabase.getReference( "User" );
 
         databaseReference.addValueEventListener( new ValueEventListener() {
@@ -120,6 +119,7 @@ public class ContactsFragment extends Fragment {
                     if (user.getUserId().contains( "==" )) {
                         user.setUserId( user.getUserId().replace( "==", "" ) );
                     }
+                    Log.d(TAG, "onDataChange: "+UserID);
 
                     Intent intentstatus=new Intent(STATUS_CHECKER);
                     intentstatus.putExtra("statuscheck",user.getStatus());
@@ -136,6 +136,7 @@ public class ContactsFragment extends Fragment {
                         imageView=user.getProfileImageURI();
                         status=user.getStatus();
                         typing=user.getIsTyping();
+token=user.getRegistrationTokenID();
 
 
                         //Offline data will save in databas
@@ -148,9 +149,11 @@ public class ContactsFragment extends Fragment {
                         contact.setProfileImageURI(imageView);
                         contact.setStatus(status);
                         contact.setIsTyping(typing);
+                        contact.setRegistrationTokenID(token);
 
+                        Log.d(TAG, "onDataChange25: "+user.getRegistrationTokenID());
                         databaseHelper.insert( contact );
-                        databaseHelper.updatetheprofileImageandstatus(imageView,status,MobileNumber);
+                        databaseHelper.updatetheprofileImageandstatus(imageView,status,MobileNumber,token);
                         contactList.add( contact );
 
                     } else {
@@ -172,6 +175,7 @@ public class ContactsFragment extends Fragment {
     }
 
     private void checkForCurrentLoggedInUser(final User user) {
+        Log.d(TAG, "checkForCurrentLoggedInUser123: "+user.getFirstname());
         //save the data login user in sharedpreference TO MESSAGE ACTIVITY
         SharedPreferences.Editor edit = mPreference.edit();
         edit.putString( AppConstant.SharedPreferenceConstant.LOGGED_IN_USER_NAME, user.getFirstname() + " " + user.getLastname() );
@@ -182,10 +186,10 @@ public class ContactsFragment extends Fragment {
                 .addOnCompleteListener( new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        String msg = getString( R.string.msg_subscribed );
+                       /* String msg = getString( R.string.msg_subscribed );
                         if (!task.isSuccessful()) {
                             msg = getString( R.string.msg_subscribe_failed );
-                        }
+                        }*/
                     }
                 } );
     }

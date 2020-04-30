@@ -92,7 +92,7 @@ public class AuthenticationActivity extends AppCompatActivity {
                       //new user
                     Intent intent = new Intent( AuthenticationActivity.this, RegistrationActivity.class );
                     intent.putExtra( "Base64_ID",new String( encoded ).trim() );
-                    intent.putExtra( "UserID",UserID );
+                  //  intent.putExtra( "UserID",UserID );
                     intent.putExtra( "MobileNumber",user);
                     startActivity( intent );
                 }

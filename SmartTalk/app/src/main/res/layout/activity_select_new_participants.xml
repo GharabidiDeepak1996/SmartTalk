@@ -9,9 +9,14 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:titleTextColor="@color/white"
+        app:title="New group"
+        app:subtitle="Add participants"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent">
+    </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/addedList_recyclerView"
@@ -30,5 +35,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/addedList_recyclerView"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintTop_toTopOf="@id/toolbar"
+        app:layout_constraintEnd_toEndOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="@id/toolbar"
+        android:text="NEXT"
+        android:backgroundTint ="@color/colorPrimary"
+        app:cornerRadius="22dp"
+        android:onClick="next"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

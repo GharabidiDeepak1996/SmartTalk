@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,10 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.smarttalk.R;
 import com.example.smarttalk.constants.AppConstant;
+import com.example.smarttalk.constants.NetworkConstants;
 import com.example.smarttalk.modelclass.Message;
-import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.BindViews;
@@ -28,12 +32,14 @@ import butterknife.ButterKnife;
 import butterknife.Optional;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.example.smarttalk.constants.NetworkConstants.MIDDLE_DATE_SHOW;
+import static com.example.smarttalk.constants.NetworkConstants.MSG_TYPE_LEFT;
+import static com.example.smarttalk.constants.NetworkConstants.MSG_TYPE_RIGHT;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
-    private static final int MSG_TYPE_LEFT = 0;
-    private static final int MSG_TYPE_RIGHT = 1;
-    private static final int SET_DATE=2;
-    String firstThirtyEightChars = "";
+
+
+    String firstThirtyEightChars ;
 
     private Context mContext;
     private List<Message> mChat;
@@ -47,20 +53,28 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == MSG_TYPE_RIGHT) {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.message_on_rightside, parent, false);
-            return new ViewHolder(view);
-        } else {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.message_on_leftside, parent, false);
-            return new ViewHolder(view);
-        }
+View view;
+        Log.d(TAG, "onCreateViewHolder2346: "+viewType);
+       switch (viewType){
+           case MSG_TYPE_RIGHT:
+                view = LayoutInflater.from(mContext).inflate(R.layout.message_on_rightside, parent, false);
+               return new MessageAdapter.ViewHolder(view);
+           case MSG_TYPE_LEFT:
+                view = LayoutInflater.from(mContext).inflate(R.layout.message_on_leftside, parent, false);
+               return new MessageAdapter.ViewHolder(view);
+           case MIDDLE_DATE_SHOW:
+                view = LayoutInflater.from(mContext).inflate(R.layout.conversation_message_item_sender_date_view, parent, false);
+               return new MessageAdapter.ViewHolder(view);
+       }
+       return null;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MessageAdapter.ViewHolder holder, int position) {
         Message message = mChat.get(position);
-
+        Log.d(TAG, "onBindViewHolder568: "+message.getBody());
         String url=mChat.get(position).getBody();
+
         holder.listTextView.get(1).setText(message.getTimeStamp());
         SharedPreferences mPreference = mContext.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE);
         String UserID = mPreference.getString(AppConstant.SharedPreferenceConstant.LOOGED_IN_USER_ID, null);
@@ -72,11 +86,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 holder.imageView.setImageResource(R.drawable.ic_done_black_24dp);
             }
         }
-
-        if(url.length()>38) {
+        if(url.length()>38 ) {
             firstThirtyEightChars = url.substring(0, 38);
+        }else{
+            firstThirtyEightChars=url;
         }
-
         if(firstThirtyEightChars.equals("https://firebasestorage.googleapis.com")){
             //this for Images
             holder.listTextView.get(0).setVisibility(View.GONE);
@@ -117,11 +131,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public int getItemViewType(int position) {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(AppConstant.SharedPreferenceConstant.SHARED_PREF_NAME, MODE_PRIVATE);
         String SenderID = sharedPreferences.getString(AppConstant.SharedPreferenceConstant.LOOGED_IN_USER_ID, "");
-        if (mChat.get(position).getSenderID().equals(SenderID)) {
+        if(mChat.get(position).getSenderID().equals(SenderID)){
             return MSG_TYPE_RIGHT;
-        } else {
+        }else if(mChat.get(position).getSenderID()!=(SenderID)){
             return MSG_TYPE_LEFT;
+        }else if(mChat.get(position).getSenderID().equals(SenderID)){
+            return MIDDLE_DATE_SHOW;
         }
+        return -1;
     }
 
     @Override
@@ -129,19 +146,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         return mChat.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
-        //   @BindViews(  {R.id.show_message,R.id.timestamp} ) TextView show_message,time_stamp;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+   //   @BindViews(  {R.id.show_message,R.id.timestamp} ) TextView show_message,time_stamp;
         //or
-        @BindViews({R.id.show_message, R.id.timestamp})
-        List<TextView> listTextView;
-
-        @BindView(R.id.clock)
+        @BindViews({R.id.show_message, R.id.timestamp}) List<TextView> listTextView;
         @Nullable
-        ImageView imageView;
-        @BindView(R.id.show_image)
-         ImageView showImages;
+        @BindView(R.id.clock) ImageView imageView;
+        @Nullable
+        @BindView(R.id.show_image) ImageView showImages;
+        @Nullable
+        @BindView(R.id.setDate) TextView middleDateShow;
 
-        ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 

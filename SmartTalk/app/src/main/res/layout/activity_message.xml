@@ -52,7 +52,8 @@
         android:layout_height="match_parent"
         android:layout_marginTop="56dp"
         android:layout_marginBottom="68dp"
-        android:scrollbars="vertical"/>
+        android:scrollbars="vertical"
+        android:background="#ECEFF1"/>
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

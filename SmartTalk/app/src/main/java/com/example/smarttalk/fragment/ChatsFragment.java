@@ -38,7 +38,10 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import uk.co.deanwild.materialshowcaseview.ShowcaseTooltip;
 
-import static com.example.smarttalk.activity.MessageActivity.THIS_BROADCAST;
+import static com.example.smarttalk.constants.NetworkConstants.SHOWCASE_ID;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST_FOR_CHAT_SEARCHBAR;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST_FOR_UPDATE_CURRENT_STATUS;
 
 
 public class ChatsFragment extends Fragment  {
@@ -51,9 +54,7 @@ public class ChatsFragment extends Fragment  {
     private FloatingActionButton febMenu, febCreate, febClose;
     public boolean isClick = false;
     Float translationY = 100f;
-    private static final String SHOWCASE_ID = "tooltip example";
-    public static final String THIS_BROADCAST_FOR_CHAT_SEARCHBAR = "this is for searchBar";
-    public static final String THIS_BROADCAST_FOR_UPDATE_CURRENT_STATUS = "this is for update current status";
+
 
     OvershootInterpolator interpolator = new OvershootInterpolator();
 

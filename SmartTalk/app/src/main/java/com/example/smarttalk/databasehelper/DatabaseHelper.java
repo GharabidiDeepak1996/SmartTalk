@@ -1,6 +1,5 @@
 package com.example.smarttalk.databasehelper;
 
-import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.example.smarttalk.activity.MessageActivity;
 import com.example.smarttalk.constants.AppConstant;
-import com.example.smarttalk.fragment.ChatsFragment;
+import com.example.smarttalk.group.pojo.GroupMessages;
 import com.example.smarttalk.modelclass.Chat;
 import com.example.smarttalk.modelclass.Message;
 import com.example.smarttalk.modelclass.ScheduleMessage;
@@ -26,10 +25,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.smarttalk.fragment.ChatsFragment.THIS_BROADCAST_FOR_CHAT_SEARCHBAR;
-import static com.example.smarttalk.fragment.ChatsFragment.THIS_BROADCAST_FOR_UPDATE_CURRENT_STATUS;
-import static com.example.smarttalk.fragment.ContactsFragment.THIS_BROADCAST_FOR_CONTACT_SEARCHBAR;
-import static com.example.smarttalk.schedule.activity.MessageSchedule.THIS_BROADCAST_FOR_NOTIFY_THE_ADAPTER;
+
+import static com.example.smarttalk.constants.NetworkConstants.MESSAGEID_STATUS_UPDATE;
+import static com.example.smarttalk.constants.NetworkConstants.NOTIFY_ADAPTER_LIST;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST_FOR_CHAT_SEARCHBAR;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST_FOR_CONTACT_SEARCHBAR;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST_FOR_NOTIFY_THE_ADAPTER;
+import static com.example.smarttalk.constants.NetworkConstants.THIS_BROADCAST_FOR_UPDATE_CURRENT_STATUS;
+import static com.example.smarttalk.constants.NetworkConstants.UPDATE_MESSAGE_STATUS_BRODCAST;
+
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
@@ -51,6 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public static final String MOBILE_NUMBER = "user_mobile";
         public static final String PROFILE_IMAGE = "profile_imagetext";
         public static final String status = "statustext";
+        public static final String REGISTRATION_TOKEN_ID = "regis_token_ID";
     }
 
     public class Messages {
@@ -84,6 +90,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public static final String ReceiverName = "RECEIVER_NAME";
 
     }
+    public class groupMessages {
+        public static final String TABLE_NAME = "GROUPMESSAGE";
+        public static final String SR_NO_ID = "SRNO_ID";
+        public static final String GROUP_ID = "GROUP_ID";
+        public static final String SENDER_ID = "SENDER_ID";
+        public static final String SENDER_NAME = "SENDER_NAME";
+        public static final String MESSAGE_ID = "MESSAGE_ID";
+        public static final String MESSAGE_BODY = "MESSAGE_BODY";
+        public static final String TIMESTAMP = "TIME_STAMP";
+    }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
@@ -108,7 +124,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Contacts.LAST_NAME + " text , " +
                 Contacts.MOBILE_NUMBER + " text UNIQUE, " +
                 Contacts.PROFILE_IMAGE + " text , " +
-                Contacts.status + " text  " +
+                Contacts.status + " text, " +
+                Contacts.REGISTRATION_TOKEN_ID + " text UNIQUE " +
                 ");";
         sqLiteDatabase.execSQL(Contactsquery);
 
@@ -131,6 +148,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Chats.MessageID + " text, " +
                 "FOREIGN KEY(" + Chats.MessageID + ") REFERENCES " + Messages.TABLE_NAME + "(" + Messages.MessageID + "));";
         sqLiteDatabase.execSQL(ChatQuery);
+
+        //Table Grou[pMessages
+        String Groupmessage = "CREATE TABLE " + groupMessages.TABLE_NAME + "( "
+                + groupMessages.SR_NO_ID + " INTEGER PRIMARY KEY AUTOINCREMENT , "
+                + groupMessages.GROUP_ID + " TEXT, "
+                + groupMessages.SENDER_ID + " TEXT, "
+                + groupMessages.SENDER_NAME + " TEXT, "
+                + groupMessages.MESSAGE_ID + " TEXT, "
+                + groupMessages.MESSAGE_BODY + " TEXT,"
+                + groupMessages.TIMESTAMP + " TEXT"
+                + ")";
+        sqLiteDatabase.execSQL(Groupmessage);
     }
 
     //Message
@@ -139,26 +168,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();    //write into the table
         ContentValues contentValues = new ContentValues();  //insert the values in rows
 
-
         contentValues.put(Messages.SenderID, message.getSenderID());
         contentValues.put(Messages.conversionID, message.getConversionID());
         contentValues.put(Messages.MessageID, message.getMessageID());
         contentValues.put(Messages.Body, message.getBody());
         contentValues.put(Messages.TimeStamp, message.getTimeStamp());
         contentValues.put(Messages.Delivery_Status_ALL, message.getDeliveryStatus());
-
         //  long row = db.insert( Messages.TABLE_NAME, null, contentValues ); //row count number of rows inserted
         long row = db.insertWithOnConflict(Messages.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
+        Log.d(TAG, "insert2348: "+row);
 
-        Intent intent = new Intent(MessageActivity.THIS_BROADCAST);
+        Intent intent = new Intent(THIS_BROADCAST);
         intent.putExtra("MessageID", message.getMessageID());
         intent.putExtra("ConversionID", message.getConversionID());
         context.sendBroadcast(intent);
-        //Make chatlist model data from message data
+
+
         Chat chat = new Chat();
         chat.unseencount = 0;
         chat.message = message;
-        insertChats(chat);
+        insertChats( chat );
     }
 
     //messageupdate status
@@ -169,7 +198,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(Messages.Delivery_Status_ALL, deliverystaus);
         long raw = database.update(Messages.TABLE_NAME, contentValues, Messages.MessageID + "=?", new String[]{String.valueOf(messageID)});
 
-        Intent intent = new Intent(MessageActivity.UPDATE_MESSAGE_STATUS_BRODCAST);
+        Intent intent = new Intent(UPDATE_MESSAGE_STATUS_BRODCAST);
         intent.putExtra("Messageid", messageID);
         context.sendBroadcast(intent);
 
@@ -186,15 +215,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(Contacts.MOBILE_NUMBER, contact.getMobilenumber());
         contentValues.put(Contacts.PROFILE_IMAGE, contact.getProfileImageURI());
         contentValues.put(Contacts.status, contact.getStatus());
+        contentValues.put(Contacts.REGISTRATION_TOKEN_ID, contact.getRegistrationTokenID());
         // long row = database.insertWithOnConflict( Contacts.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE );
         long row = database.insertWithOnConflict(Contacts.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
-    public void updatetheprofileImageandstatus(String profileImages, String status, String number) {
+    public void updatetheprofileImageandstatus(String profileImages, String status, String number,String Tokem) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(Contacts.PROFILE_IMAGE, profileImages);
         values.put(Contacts.status, status);
+        values.put(Contacts.REGISTRATION_TOKEN_ID,Tokem);
         db.update(Contacts.TABLE_NAME, values, "user_mobile = ?", new String[]{number});
 
         Intent intent=new Intent(THIS_BROADCAST_FOR_UPDATE_CURRENT_STATUS);
@@ -202,7 +233,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         context.sendBroadcast(intent);
     }
 
-    //this for scheduling messages.
+    //this for scheduling messages./////////////////////////////////////
     public List<User> display() {
 
         String query = "SELECT * FROM " + Contacts.TABLE_NAME;
@@ -216,11 +247,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String first_name = cursor.getString(cursor.getColumnIndex(Contacts.FIRST_NAME));
             String last_name = cursor.getString(cursor.getColumnIndex(Contacts.LAST_NAME));
             String mobile_number = cursor.getString(cursor.getColumnIndex(Contacts.MOBILE_NUMBER));
+            String reg_token=cursor.getString(cursor.getColumnIndex(Contacts.REGISTRATION_TOKEN_ID));
+            String image_url=cursor.getString(cursor.getColumnIndex(Contacts.PROFILE_IMAGE));
+            String status=cursor.getString(cursor.getColumnIndex(Contacts.status));
+            String registrationTokenID=cursor.getString(cursor.getColumnIndex(Contacts.REGISTRATION_TOKEN_ID));
 
+            Log.d(TAG, "display25: "+registrationTokenID);
             contact.setUserId(user_id);
             contact.setFirstname(first_name);
             contact.setLastname(last_name);
             contact.setMobilenumber(mobile_number);
+            contact.setRegistrationTokenID(reg_token);
+            contact.setProfileImageURI(image_url);
+            contact.setStatus(status);
+            contact.setRegistrationTokenID(registrationTokenID);
             ContactList.add(contact);
 
         }
@@ -285,7 +325,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             for (int i = 0; i <= MessageList.size(); i++) {
                 String message1f = message.getMessageID();
 
-                Intent intent = new Intent(MessageActivity.MESSAGEID_STATUS_UPDATE);
+                Intent intent = new Intent(MESSAGEID_STATUS_UPDATE);
                 intent.putExtra("Messagestatus", message1f);
                 context.sendBroadcast(intent);
             }
@@ -528,11 +568,58 @@ message.setReceiverName(ReceiverName);
         intent.putExtra("Notify","successful");
         context.sendBroadcast(intent);
     }
+
+    public void groupMessageInsert(GroupMessages groupMessage){
+        SQLiteDatabase db = this.getWritableDatabase();    //write into the table
+        ContentValues contentValues = new ContentValues();  //insert the values in rows
+
+        contentValues.put(groupMessages.GROUP_ID,groupMessage.getGroupID());
+        contentValues.put(groupMessages.SENDER_ID, groupMessage.getSenderID());
+        contentValues.put(groupMessages.SENDER_NAME, groupMessage.getSenderName());
+        contentValues.put(groupMessages.MESSAGE_ID, groupMessage.getMessageID());
+        contentValues.put(groupMessages.MESSAGE_BODY, groupMessage.getMessageBody());
+        contentValues.put(groupMessages.TIMESTAMP, groupMessage.getTimeStamp());
+        long row = db.insertWithOnConflict(groupMessages.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
+
+        Intent intent=new Intent(NOTIFY_ADAPTER_LIST);
+        intent.putExtra("notify","listNofity");
+        context.sendBroadcast(intent);
+    }
+
+    public List<GroupMessages> fetchGroupMessages(String groupID){
+        SQLiteDatabase readableDatabase = this.getReadableDatabase();
+        String query = "SELECT * FROM " + groupMessages.TABLE_NAME + " WHERE " + groupMessages.GROUP_ID + " = '" + groupID + "';";
+        Cursor cursor = readableDatabase.rawQuery(query, null);
+        List<GroupMessages> groupMessagesList=new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            GroupMessages messages=new GroupMessages();
+            String GroupID = cursor.getString(cursor.getColumnIndex(groupMessages.GROUP_ID));
+            String SenderName = cursor.getString(cursor.getColumnIndex(groupMessages.SENDER_NAME));
+            String SenderID = cursor.getString(cursor.getColumnIndex(groupMessages.SENDER_ID));
+            String MessageBody = cursor.getString(cursor.getColumnIndex(groupMessages.MESSAGE_BODY));
+            String MessageID = cursor.getString(cursor.getColumnIndex(groupMessages.MESSAGE_ID));
+            String TimeStamp = cursor.getString(cursor.getColumnIndex(groupMessages.TIMESTAMP));
+
+            messages.setGroupID(GroupID);
+            messages.setSenderID(SenderID);
+            messages.setSenderName(SenderName);
+            messages.setMessageBody(MessageBody);
+messages.setMessageID(MessageID);
+messages.setTimeStamp(TimeStamp);
+
+            groupMessagesList.add(messages);
+
+        }
+        cursor.close();
+        return groupMessagesList;
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         // If you need to add a column
        /* if (newVersion > oldVersion) {
-            sqLiteDatabase.execSQL( "ALTER TABLE " + Messages.TABLE_NAME + " ADD COLUMN " + Messages.Delivery_Status_IS + " TEXT");
+            sqLiteDatabase.execSQL( "ALTER TABLE " + groupMessages.TABLE_NAME + " ADD COLUMN " + Messages.Delivery_Status_IS + " TEXT");
         }*/
     }
 

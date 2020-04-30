@@ -7,7 +7,9 @@
     <color name="online">#47D476</color>
     <color name="offline">#FF0000</color>
     <color name="feb_background_color">#A0A0A0</color>
-<color name="black">#000</color>
+    <color name="greyish">#ff8f8f8f</color>
+
+    <color name="black">#000</color>
     <item name="tooltip_mask" type="color">#CC4f5355</item>
     <color name="white">#FFFF</color>
 
