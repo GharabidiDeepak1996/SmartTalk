@@ -12,6 +12,7 @@
 * View their profile image and status
 # --->MAINTAIN OWN ACCOUNT
 * Change Profile Image
+* Remove Profile Image
 * Create Group Chat
 # --->CHAT WITH FRIENDS
 * Send Messages
