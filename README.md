@@ -1,5 +1,5 @@
 # SmartTalk
-![grab-landing-page](https://media.giphy.com/media/XfaO0cE7JEfynXWcCJ/giphy.gif)
+![grab-landing-page](https://media.giphy.com/media/jQnSqJEKwwHusaJ6Es/giphy.gif)
 
 # FEATURES
 # --->LOGIN , REGISTER
